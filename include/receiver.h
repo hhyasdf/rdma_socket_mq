@@ -1,9 +1,9 @@
 #ifndef RECIEVER
 #define RECIEVER
 
-
 #include "rdma_socket.h"
 #include <pthread.h>
+
 
 typedef struct Receiver_{
     Socket *listener;

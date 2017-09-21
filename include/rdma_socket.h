@@ -1,3 +1,7 @@
+#ifndef RDMA_SOCKET
+#define RDMA_SOCKET
+
+
 #include <rdma/rdma_cma.h>
 #include <stdint.h>
 #include "queue.h"
@@ -6,9 +10,6 @@
 #include "receiver.h"
 #include "message.h"
 
-
-#ifndef RDMA_SOCKET
-#define RDMA_SOCKET
 
 #define METADATA_ACK 0
 #define METADATA_NORMAL 1

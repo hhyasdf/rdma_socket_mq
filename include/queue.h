@@ -1,7 +1,8 @@
-#include <pthread.h>
-
 #ifndef _RECVQUEUE_
 #define _RECVQUEUE_
+
+
+#include <pthread.h>
 
 typedef struct Node_ {
     void *buffer;

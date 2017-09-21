@@ -1,7 +1,7 @@
-#include "rdma_socket.h"
-
 #ifndef POLLWC
 #define POLLWC
+
+#include "rdma_socket.h"
 
 int poll_wc(Socket *socket_, struct ibv_wc *send_wc);
 void close_handle(Socket *socket_, struct ibv_wc *wc);
