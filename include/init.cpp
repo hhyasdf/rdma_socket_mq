@@ -18,7 +18,7 @@ void build_params(struct rdma_conn_param *params)                // remote read 
 }
 
 
-Socket *buildConnection(struct rdma_cm_id *id) {  // 用收到的id中的verbs作为
+Socket *buildConnection(struct rdma_cm_id *id, Receiver *receiver) {  // 用收到的id中的verbs作为
 
     Socket *new_socket_ = (Socket *)malloc(sizeof(Socket));
     memset(new_socket_, 0, sizeof(Socket));
@@ -60,6 +60,7 @@ Socket *buildConnection(struct rdma_cm_id *id) {  // 用收到的id中的verbs�
 
     new_socket_->recv_queue = queue_init();
     new_socket_->wr_queue = queue_init();
+    new_socket_->msg_queue = queue_init();
 
     pthread_mutex_init(&new_socket_->peer_buff_count_lock, NULL);
     pthread_mutex_init(&new_socket_->ack_counter_lock, NULL);
@@ -70,6 +71,8 @@ Socket *buildConnection(struct rdma_cm_id *id) {  // 用收到的id中的verbs�
     new_socket_->ack_counter = 0;
     new_socket_->metadata_counter = 0;
     new_socket_->close_flag = 0;
+
+    new_socket_->receiver = receiver;
 
     // pthread_mutex_init(&new_socket_->close_lock, NULL);
     // pthread_cond_init(&new_socket_->close_cond, NULL);

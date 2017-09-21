@@ -65,3 +65,22 @@ void queue_destroy(Queue *queue) {
     free(queue);
     pthread_mutex_unlock(&queue->queue_lock);
 }
+
+bool queue_if_empty(Queue *queue) {
+    return (queue->tail == NULL);
+}
+
+void queue_push_q(Queue *queue, Queue *q) {
+    pthread_mutex_lock(&queue->queue_lock);
+
+    if(q->tail != NULL) {
+        if(queue->tail != NULL) {
+            queue->tail->next = q->head;
+        } else {
+            queue->head = q->head;
+        }
+    queue->tail = q->tail;
+    }
+    
+    pthread_mutex_unlock(&queue->queue_lock);
+}

@@ -3,6 +3,8 @@
 #include "queue.h"
 #include <netdb.h>
 #include <pthread.h>
+#include "receiver.h"
+#include "message.h"
 
 
 #ifndef RDMA_SOCKET
@@ -16,8 +18,10 @@
 #define BLOCKRECV 0
 #define NOTBLOCKRECV 1
 
+#define SNDMORE_FLAG 10086
 
-#define MDBUFFERSIZE 10                // 缓冲区大小
+
+#define MDBUFFERSIZE 100                // 缓冲区大小
 
 
 #define TEST_NZ(x) do { if ( (x)) die("error: " #x " failed (returned non-zero)." ); } while (0)
@@ -32,6 +36,7 @@ typedef struct Msg_ {
 
 typedef struct MetaData_ {
     int type;                              //  METADATA_ACK 和 #define METADATA_NORMAL 和 #define METADATA_CLOSE
+    int tag;
     size_t length;                         
     uint64_t msg_addr;
     uint64_t mr_addr;
@@ -55,6 +60,8 @@ typedef struct Socket_ {
     Queue *recv_queue;
     Queue *wr_queue;
 
+    Queue *msg_queue;
+
     MetaData *metaData_buffer;
 
     pthread_t close_pthread;
@@ -74,6 +81,8 @@ typedef struct Socket_ {
 
     int close_flag;
 
+    Receiver *receiver;
+
 }Socket;
 
 void die(char *msg);
@@ -81,11 +90,11 @@ void die(char *msg);
 Socket* socket_(enum rdma_port_space type);
 void listen_(Socket *socket_, int backlog);
 Socket *connect_(Socket *socket_, char *address, char *port);
-Socket *accept_(Socket *socket_);
+Socket *accept_(Socket *socket_, Receiver *receiver);
 void bind_(Socket *socket_, void *addr, int protocol);
 void close_(Socket *socket_);
 void recv_(Socket *socket_, void **recv_buffer);
-int send_(Socket *socket_, const void *buffer, size_t length);
+int send_(Socket *socket_, const void *msg, size_t length);
 
 
 

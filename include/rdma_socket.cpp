@@ -152,7 +152,7 @@ static void *wait_for_close(void *socket_) {
 }
 
 
-Socket *accept_(Socket *socket_) {
+Socket *accept_(Socket *socket_, Receiver *receiver) {
 
     struct rdma_cm_event *event = NULL;
     struct rdma_event_channel *ec = socket_->ec;
@@ -170,7 +170,7 @@ Socket *accept_(Socket *socket_) {
 
         if(event_copy.event == RDMA_CM_EVENT_CONNECT_REQUEST) {
             
-            new_socket_ = buildConnection(event_copy.id);
+            new_socket_ = buildConnection(event_copy.id, receiver);
             ec = new_socket_->ec;
 
             build_params(&cm_params);
@@ -206,7 +206,7 @@ Socket *connect_(Socket *socket_, char *address, char *port) {
             exit(0);
         } else if (event.event == RDMA_CM_EVENT_ADDR_RESOLVED) {
 		// printf("1\n");
-            new_socket_ = buildConnection(event.id);
+            new_socket_ = buildConnection(event.id, NULL);
             ec = new_socket_->ec;
             free(socket_);            
             rdma_resolve_route(event.id, TIMEOUT_IN_MS);
@@ -252,7 +252,7 @@ void close_(Socket *socket_) {                   // 释放socket结构体和其�
 }
 
 
-int send_(Socket *socket_, const void *buffer, size_t length) {      // 当一次性send操作数超过初始的缓冲区大小会被阻塞
+int send_(Socket *socket_, const void *msg, size_t length) {      // 当一次性send操作数超过初始的缓冲区大小会被阻塞
 
     struct ibv_send_wr *bad_wr = NULL;
     struct ibv_mr *send_mr, *msg_mr;
@@ -262,7 +262,7 @@ int send_(Socket *socket_, const void *buffer, size_t length) {      // 当一�
 
     void *buffer_copy = malloc(length);
 
-    memcpy(buffer_copy, buffer, length);
+    memcpy(buffer_copy, msg, length);
 
     MetaData metadata;
 
@@ -283,17 +283,17 @@ int send_(Socket *socket_, const void *buffer, size_t length) {      // 当一�
     metadata.mr_addr = (uint64_t)msg_mr;
     metadata.type = METADATA_NORMAL;
 
-    pthread_mutex_lock(&socket_->peer_buff_count_lock);
+    // pthread_mutex_lock(&socket_->peer_buff_count_lock);
     if(socket_->peer_buff_count <= 0) {
         poll_wc(socket_, NULL);
     }
-    pthread_mutex_unlock(&socket_->peer_buff_count_lock);
+    // pthread_mutex_unlock(&socket_->peer_buff_count_lock);
 
     send_mr = post_send_wr(socket_, &metadata);
 
-    pthread_mutex_lock(&socket_->peer_buff_count_lock);
+    // pthread_mutex_lock(&socket_->peer_buff_count_lock);
     socket_->peer_buff_count --;
-    pthread_mutex_unlock(&socket_->peer_buff_count_lock);
+    // pthread_mutex_unlock(&socket_->peer_buff_count_lock);
 
     while(poll_wc(socket_, &wc));
     if(wc.status != IBV_WC_SUCCESS) {

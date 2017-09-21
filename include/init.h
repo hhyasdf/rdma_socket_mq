@@ -6,7 +6,7 @@
 
 
 void build_params(struct rdma_conn_param *params);
-Socket *buildConnection(struct rdma_cm_id *id);
+Socket *buildConnection(struct rdma_cm_id *id, Receiver *receiver);
 
 
 
