@@ -160,6 +160,8 @@ Socket *accept_(Socket *socket_, Receiver *receiver) {
     struct rdma_cm_event event_copy;
     struct rdma_conn_param cm_params;
     
+    printf("%s :%d\n", __FILE__, __LINE__);
+
     while (rdma_get_cm_event(ec, &event) == 0) {
         
         // printf("%d\n", ec);
@@ -167,6 +169,7 @@ Socket *accept_(Socket *socket_, Receiver *receiver) {
         memcpy(&event_copy, event, sizeof(*event));
 
         rdma_ack_cm_event(event);
+        printf("%s :%d\n", __FILE__, __LINE__);
 
         if(event_copy.event == RDMA_CM_EVENT_CONNECT_REQUEST) {
             
@@ -181,6 +184,8 @@ Socket *accept_(Socket *socket_, Receiver *receiver) {
 
             return new_socket_;
         }
+
+        printf("%s :%d\n", __FILE__, __LINE__);
     }
 }
 

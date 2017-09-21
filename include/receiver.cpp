@@ -50,10 +50,10 @@ static void *listen_process(void *re) {
     pthread_t p_id;
 
     while(1) {
+        printf("%s :%d\n", __FILE__, __LINE__);
         listen = accept_(((Receiver *)re)->listener, (Receiver *)re);
+        printf("%s :%d\n", __FILE__, __LINE__);
         listen->receiver = (Receiver *)re;
-
-        printf("listen->receiver: %p\n", listen->receiver);
         
         queue_push(((Receiver *)re)->socket_queue, static_cast<void *>(listen));
         pthread_create(&p_id, NULL, recv_process, (void *)listen);
