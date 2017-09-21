@@ -11,7 +11,7 @@
 Receiver *receiver_build() {
     Receiver *n = (Receiver *)malloc(sizeof(Receiver));
 
-    n->listener = nullptr;
+    n->listener = NULL;
     n->recv_queue = queue_init();
     n->socket_queue = queue_init();
 
@@ -46,7 +46,7 @@ static void *recv_process(void *listen) {
 }
 
 static void *listen_process(void *re) {
-    Socket *listen = nullptr;
+    Socket *listen = NULL;
     pthread_t p_id;
 
     while(1) {
@@ -72,7 +72,7 @@ void receiver_bind(Receiver* re, int port) {
     addr.sin_port = htons(port);
     addr.sin_family = AF_INET;
 
-    Socket *socket = nullptr;
+    Socket *socket = NULL;
 
     socket = socket_(RDMA_PS_TCP);
     bind_(socket, &addr, AF_INET);
@@ -95,7 +95,7 @@ Message *receiver_recv(Receiver* re) {
 
 
 void receiver_close(Receiver *re) {
-    Socket *socket = nullptr;
+    Socket *socket = NULL;
     close_(re->listener);
     while((socket = static_cast<Socket *>(queue_pop(re->socket_queue))) != NULL) {
         close_(socket);
