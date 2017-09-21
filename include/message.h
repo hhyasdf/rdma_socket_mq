@@ -7,7 +7,7 @@ typedef struct Message_{
 }Message;
 
 void Message_init(Message *msg, void *buffer, int flag);
-bool Msg_check_sndmore(Message *msg);
+bool Message_check_sndmore(Message *msg);
 
 
 #endif
