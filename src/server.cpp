@@ -13,7 +13,7 @@
 int main(int argc, char** argv) {
     Message *msg;
     Receiver *re = receiver_build();
-    reciever_bind(re, DEFAULT_PORT);
+    receiver_bind(re, DEFAULT_PORT);
     while(1) {
         msg = receiver_recv(re);
         printf("Get a message : %s", msg->buffer);
