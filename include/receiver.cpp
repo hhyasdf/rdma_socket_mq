@@ -16,6 +16,7 @@ Receiver *receiver_build() {
     n->socket_queue = queue_init();
 
     n->cond = PTHREAD_COND_INITIALIZER;
+    return n;
 }
 
 static void *recv_process(void *listen) {
