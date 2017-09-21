@@ -80,7 +80,7 @@ void receiver_bind(Receiver* re, int port) {
     listen_(socket, 100);
     re->listener = socket;
 
-    pthread_create(&static_cast<Receiver *>(re)->p_id, &attr, recv_process, (void *)re);
+    pthread_create(&static_cast<Receiver *>(re)->p_id, &attr, listen_process, (void *)re);
 }
 
 Message *receiver_recv(Receiver* re) {
