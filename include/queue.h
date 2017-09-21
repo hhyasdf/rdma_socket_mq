@@ -21,5 +21,6 @@ void queue_push(Queue *queue, void *buffer);
 void *queue_pop(Queue *queue);
 void queue_destroy(Queue *queue);
 bool queue_if_empty(Queue *queue);
+void queue_push_q(Queue *queue, Queue *q);
 
 #endif
