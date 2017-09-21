@@ -50,6 +50,7 @@ static void *listen_process(void *re) {
 
     while(1) {
         listen = accept_(((Receiver *)re)->listener, (Receiver *)re);
+        listen->receiver = (Receiver *)re;
         
         queue_push(((Receiver *)re)->socket_queue, static_cast<void *>(listen));
         pthread_create(&p_id, NULL, recv_process, (void *)listen);
