@@ -1,12 +1,13 @@
-#ifndef RECIEVER
-#define RECIEVER
+#ifndef RECIEVER_H_
+#define RECIEVER_H_
 
 #include "rdma_socket.h"
 #include <pthread.h>
 
 
+
 typedef struct Receiver_{
-    Socket *listener;
+    struct Socket_ *listener;
     Queue *recv_queue;                // 用来缓存这个reciver所有接收到的消息
     Queue *socket_queue;
 

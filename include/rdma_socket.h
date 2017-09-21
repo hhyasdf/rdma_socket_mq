@@ -82,7 +82,7 @@ typedef struct Socket_ {
 
     int close_flag;
 
-    Receiver *receiver;
+    struct Receiver_ *receiver;
 
 }Socket;
 
