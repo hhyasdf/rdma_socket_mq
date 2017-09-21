@@ -48,9 +48,9 @@ static void *listen_process(void *re) {
     pthread_t p_id;
 
     while(1) {
-        listen = accept_(static_cast<Receiver *>(re)->listener, re);
+        listen = accept_(((Receiver *)re)->listener, (Receiver *)re);
         
-        queue_push(static_cast<Receiver *>(re)->socket_queue, static_cast<void *>(listen));
+        queue_push(((Receiver *)re)->socket_queue, static_cast<void *>(listen));
         pthread_create(&p_id, NULL, recv_process, (void *)listen);
     }
 }
