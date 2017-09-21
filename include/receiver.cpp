@@ -26,6 +26,7 @@ static void *recv_process(void *listen) {
     while(1) {
         recv_(l, (void **)&msg);
 
+        printf("msg: %p\n", msg);
         if(msg == NULL){
             queue_push_q(l->receiver->recv_queue, msg_queue);
             break;
@@ -51,6 +52,8 @@ static void *listen_process(void *re) {
     while(1) {
         listen = accept_(((Receiver *)re)->listener, (Receiver *)re);
         listen->receiver = (Receiver *)re;
+
+        printf("listen->receiver: %p\n", listen->receiver);
         
         queue_push(((Receiver *)re)->socket_queue, static_cast<void *>(listen));
         pthread_create(&p_id, NULL, recv_process, (void *)listen);
@@ -58,7 +61,7 @@ static void *listen_process(void *re) {
 }
 
 
-void reciever_bind(Receiver* re, int port) {
+void receiver_bind(Receiver* re, int port) {
     struct sockaddr_in addr;
     pthread_t p_id;
     pthread_attr_t attr;

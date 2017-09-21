@@ -16,7 +16,7 @@ typedef struct Receiver_{
 }Receiver;
 
 Receiver *receiver_build();
-void reciever_bind(Receiver* re, int port);
+void receiver_bind(Receiver* re, int port);
 struct Message_ *receiver_recv(Receiver* re);
 void receiver_close(Receiver *re);
 
