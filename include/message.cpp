@@ -3,7 +3,7 @@
 #include <stdlib.h>
 
 
-Message *Message_create(void *buffer, int length, int flag) {
+Message *Message_create(void *buffer, int length, int flag) {          // buffer要自己分配
     Message *msg = (Message *)malloc(sizeof(Message));
     msg->buffer = buffer;
     msg->flag = flag;

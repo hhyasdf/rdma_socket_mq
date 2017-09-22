@@ -1,5 +1,6 @@
 #include "../include/rdma_socket.h"
 #include <stdio.h>
+#include <stdlib.h>
 
 #define MSG_LEN 32
 #define MSG "A message from client!@#$%^&*()"
@@ -22,7 +23,9 @@ int main(int argc, char **argv) {
         while(ch=='\n') scanf("%c",&ch);
         // send msg
         Message *msg;
-        msg = Message_create((void *)MSG, sizeof(MSG), 0);
+        char *buffer = (char *)malloc(sizeof(MSG));
+        memcpy(buffer, MSG, sizeof(MSG));
+        msg = Message_create(buffer, sizeof(MSG), 0);
         if(send_(connect, msg))break;
         printf("%s\n", msg->buffer);
         Message_destroy(msg);

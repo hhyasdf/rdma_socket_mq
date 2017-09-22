@@ -39,7 +39,7 @@ void queue_push(Queue *queue, void *buffer) {
 void *queue_pop(Queue *queue) {
     pthread_mutex_lock(&queue->queue_lock);
 
-    printf("pop one!\n");
+    // printf("pop one!\n");
 
     Node *old_head = queue->head;
     if(old_head == NULL) {
