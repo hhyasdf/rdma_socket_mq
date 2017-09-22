@@ -77,6 +77,7 @@ int resolve_wr_queue(Socket *socket_) {               // 处理 wr_queue 中的 
     while((wc = (struct ibv_wc *)queue_pop(socket_->wr_queue)) != NULL) {
         if((stat = recv_wc_handle(socket_, wc, recv_msg)) == RDMAREADSOLVED) {
             queue_push(socket_->recv_queue, recv_msg);
+            printf("buffer: %p, length: %d, flag: %d\n", recv_msg->buffer, recv_msg->length, recv_msg->flag);
             flag = 0;
         } else if (stat == ERRORWC) {
             return -1;
