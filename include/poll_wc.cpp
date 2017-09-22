@@ -16,7 +16,7 @@
 
 void close_handle(Socket *socket_, struct ibv_wc *wc) {                          // 关闭时处理wc的函数
     Rinfo *rinfo  = (Rinfo *)wc->wr_id;
-    MetaData *recv_buffer = (MetaData *)rinfo->buffer;
+    MetaData *recv_buffer = (MetaData *)rinfo->buffer;;
 
     if(recv_buffer->type == METADATA_ACK) {
         ibv_dereg_mr((struct ibv_mr *)recv_buffer->mr_addr);
@@ -49,7 +49,7 @@ int poll_wc(Socket *socket_, struct ibv_wc *send_wc) {       // 获取一个提�
     ibv_ack_cq_events(cq, 1);
 
     while(ibv_poll_cq(cq, 1, &wc) == 1) {
-        if(wc.opcode == IBV_WC_SEND || wc.opcode == IBV_WC_RDMA_READ){
+        if(wc.opcode != IBV_WC_RECV){
             if(send_wc != NULL) {
                 memcpy(send_wc, &wc, sizeof(wc));
             }
@@ -162,17 +162,17 @@ int recv_wc_handle(Socket *socket_, struct ibv_wc *wc, void **read_buffer) {    
 
     } else if (md_buffer->type == METADATA_ACK) {
 
-        pthread_mutex_lock(&socket_->peer_buff_count_lock);
+        // pthread_mutex_lock(&socket_->peer_buff_count_lock);
         socket_->peer_buff_count ++;
-        pthread_mutex_unlock(&socket_->peer_buff_count_lock);
+        // pthread_mutex_unlock(&socket_->peer_buff_count_lock);
 
         ibv_dereg_mr((struct ibv_mr *)md_buffer->mr_addr);
         free((void *)md_buffer->msg_addr);
         md_buffer->msg_addr = NULL;
 
-        pthread_mutex_lock(&socket_->ack_counter_lock);
+        // pthread_mutex_lock(&socket_->ack_counter_lock);
         socket_->ack_counter ++;
-        pthread_mutex_unlock(&socket_->ack_counter_lock);
+        // pthread_mutex_unlock(&socket_->ack_counter_lock);
 
         TEST_NZ(rdma_post_recv(socket_->id, 
         rinfo, 
