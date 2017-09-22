@@ -26,11 +26,12 @@ static void *recv_process(void *listen) {
     while(1) {
         recv_(l, (void **)&msg);
 
-        printf("recv a msg: %s\n", msg->buffer);
         if(msg == NULL){
             queue_push_q(l->receiver->recv_queue, msg_queue);
             break;
         }
+
+        printf("recv a msg: %s\n", msg->buffer);
 
         if (msg->flag == SNDMORE_FLAG) {
             queue_push(l->msg_queue, (void *)msg);
