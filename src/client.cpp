@@ -15,7 +15,6 @@ void *send_process(void *socket){
         printf("Send a message: %s!\n", MSG);
         send_((Socket *)socket, static_cast<void *>(&msg), sizeof(msg));
     }
-    sleep(5);
     close_((Socket *)socket);
 }
 
