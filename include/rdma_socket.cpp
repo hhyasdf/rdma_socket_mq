@@ -325,7 +325,7 @@ Message *recv_(Socket *socket_) {            // 用户提供指针地址，函�
     struct ibv_cq *cq;
     Message *recv_msg;
 
-    printf("Receive a message!\n");
+    printf("%s: line: %d", __FILE__, __LINE__);
 
     if(pthread_mutex_trylock(&socket_->close_lock)) {
         return NULL;
@@ -347,10 +347,13 @@ Message *recv_(Socket *socket_) {            // 用户提供指针地址，函�
     }
 
     if((recv_msg = (Message *)queue_pop(socket_->recv_queue)) != NULL) {
+        printf("%s: line: %d", __FILE__, __LINE__);
         return NULL;
     } else if(pthread_mutex_trylock(&socket_->close_lock)) {    // 往下 *recv_buffer 都为 NULL
+        printf("%s: line: %d", __FILE__, __LINE__);
         return NULL;
     } else if (socket_->close_flag == 1) {
+        printf("%s: line: %d", __FILE__, __LINE__);
         return NULL;                                   
     } else {
         pthread_mutex_unlock(&socket_->close_lock);                          
@@ -359,15 +362,18 @@ Message *recv_(Socket *socket_) {            // 用户提供指针地址，函�
         // }
         while(flag == 1){
             if(poll_wc(socket_, NULL) == -1) {
+                printf("%s: line: %d", __FILE__, __LINE__);
                 return NULL;
             }
             flag = resolve_wr_queue(socket_);
         }
     }
+    printf("%s: line: %d", __FILE__, __LINE__);
 
     if(flag == -1) { 
         socket_->close_flag = 1;                  // 断开连接会将 close_flag 设成 1
     }
+    printf("%s: line: %d", __FILE__, __LINE__);
     return (Message *)queue_pop(socket_->recv_queue);
 }
 
