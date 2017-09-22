@@ -38,6 +38,8 @@ void queue_push(Queue *queue, void *buffer) {
 void *queue_pop(Queue *queue) {
     pthread_mutex_lock(&queue->queue_lock);
 
+    printf();
+
     Node *old_head = queue->head;
     if(old_head == NULL) {
         pthread_mutex_unlock(&queue->queue_lock);

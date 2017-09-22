@@ -26,7 +26,7 @@ static void *recv_process(void *listen) {
     while(1) {
         recv_(l, (void **)&msg);
 
-        printf("msg: %p\n", msg);
+        // printf("msg: %p\n", msg);
         if(msg == NULL){
             queue_push_q(l->receiver->recv_queue, msg_queue);
             break;
@@ -50,9 +50,9 @@ static void *listen_process(void *re) {
     pthread_t p_id;
 
     while(1) {
-        printf("%s :%d\n", __FILE__, __LINE__);
+        // printf("%s :%d\n", __FILE__, __LINE__);
         listen = accept_(((Receiver *)re)->listener, (Receiver *)re);
-        printf("%s :%d\n", __FILE__, __LINE__);
+        // printf("%s :%d\n", __FILE__, __LINE__);
         listen->receiver = (Receiver *)re;
         
         queue_push(((Receiver *)re)->socket_queue, static_cast<void *>(listen));
