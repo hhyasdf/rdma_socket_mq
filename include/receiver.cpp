@@ -26,7 +26,7 @@ static void *recv_process(void *listen) {
     while(1) {
         recv_(l, (void **)&msg);
 
-        // printf("msg: %p\n", msg);
+        printf("recv a msg: %s\n", ((Message *)msg)->buffer);
         if(msg == NULL){
             queue_push_q(l->receiver->recv_queue, msg_queue);
             break;
