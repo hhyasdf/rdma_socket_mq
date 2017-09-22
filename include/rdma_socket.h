@@ -11,10 +11,10 @@
 #include "message.h"
 
 
-#define METADATA_ACK 0
-#define METADATA_NORMAL 1
-#define METADATA_CLOSE 2
-#define METADATA_SNDMORE 3
+#define METADATA_ACK 101
+#define METADATA_NORMAL 102
+#define METADATA_CLOSE 103
+#define METADATA_SNDMORE 104
 
 #define TIMEOUT_IN_MS 500
 #define BLOCKRECV 0
