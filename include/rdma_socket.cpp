@@ -348,7 +348,7 @@ Message *recv_(Socket *socket_) {            // 用户提供指针地址，函�
 
     if((recv_msg = (Message *)queue_pop(socket_->recv_queue)) != NULL) {
         printf("%s: line: %d\n", __FILE__, __LINE__);
-        return NULL;
+        return recv_msg;
     } else if(pthread_mutex_trylock(&socket_->close_lock)) {    // 往下 *recv_buffer 都为 NULL
         printf("%s: line: %d\n", __FILE__, __LINE__);
         return NULL;
