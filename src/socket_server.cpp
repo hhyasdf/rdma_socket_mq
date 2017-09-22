@@ -34,27 +34,25 @@ int main(int argc, char** argv) {
 
     listen_(socket, 10);
 
-    while(1) {
-        listen = accept_(socket, NULL);
-        Message *buffer = (Message *)1;
+    listen = accept_(socket, NULL);
+    Message *buffer = (Message *)1;
         
         // sleep(5);          // 测试缓冲计数 达到缓冲最大值时send会阻塞 默认是10
         // printf("ready\n");
-        while(buffer != NULL){
-            buffer = recv_(listen);
+    while(1){
+        buffer = recv_(listen);
 
-            if(buffer == NULL){
+        if(buffer == NULL){
 
-                printf("stop recv !\n");
+            printf("stop recv !\n");
 
-                break;
-            }
-            printf("%s\n", buffer->buffer);
-            Message_destroy(buffer);
+            break;
         }
-
-        printf("\n");
-
-        close_(listen);
+        printf("%s\n", buffer->buffer);
+        Message_destroy(buffer);
     }
+
+    printf("\n");
+
+    close_(listen);
 }
