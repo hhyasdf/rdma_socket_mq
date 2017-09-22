@@ -325,6 +325,8 @@ Message *recv_(Socket *socket_) {            // 用户提供指针地址，函�
     struct ibv_cq *cq;
     Message *recv_msg;
 
+    printf("Receive a message!\n");
+
     if(pthread_mutex_trylock(&socket_->close_lock)) {
         return NULL;
     }
