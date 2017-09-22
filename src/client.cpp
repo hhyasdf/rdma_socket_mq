@@ -11,6 +11,7 @@ void *send_process(void *socket){
     Message_init(&msg, (void *)MSG, 0);
 
     for(int i = 0; i < MSG_COUNT; i ++) {
+        printf("Send a message: %s!\n", MSG);
         send_((Socket *)socket, static_cast<void *>(&msg), sizeof(msg));
     }
     close_((Socket *)socket);
