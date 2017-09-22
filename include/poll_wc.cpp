@@ -56,7 +56,7 @@ int poll_wc(Socket *socket_, struct ibv_wc *send_wc) {       // 获取一个提�
                 memcpy(send_wc, &wc, sizeof(wc));
             }
             flag = 0;
-        } else {
+        } else if(wc.opcode == IBV_WC_RECV){
             wc_save = malloc(sizeof(struct ibv_wc));
             memcpy(wc_save, &wc, sizeof(wc));
             queue_push(socket_->wr_queue, wc_save);
