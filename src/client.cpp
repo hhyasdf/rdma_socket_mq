@@ -1,5 +1,6 @@
 #include "../include/rdma_socket.h"
 #include <stdio.h>
+#include <unistd.h>
 
 #define MSG_LEN 32
 #define MSG "A message from client!@#$%^&*()"
@@ -14,6 +15,7 @@ void *send_process(void *socket){
         printf("Send a message: %s!\n", MSG);
         send_((Socket *)socket, static_cast<void *>(&msg), sizeof(msg));
     }
+    sleep(5);
     close_((Socket *)socket);
 }
 
