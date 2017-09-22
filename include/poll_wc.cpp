@@ -11,21 +11,13 @@
 #define RDMAREADSOLVED 8
 #define ACKSOLVED 9
 #define ERRORWC 10
-#define RDMASNDMORE 11
 
 
 void close_handle(Socket *socket_, struct ibv_wc *wc) {                          // 关闭时处理wc的函数
     Rinfo *rinfo  = (Rinfo *)wc->wr_id;
-    if(rinfo == NULL) {
-        return ;
-    }
     MetaData *recv_buffer = (MetaData *)rinfo->buffer;
-    if(recv_buffer == NULL) {
-        return ;
-    }
 
     if(recv_buffer->type == METADATA_ACK) {
-        // printf("%s: line: %d: mr_addr: %p\n", __FILE__, __LINE__, ((struct ibv_mr *)recv_buffer->mr_addr));
         ibv_dereg_mr((struct ibv_mr *)recv_buffer->mr_addr);
         free((void *)recv_buffer->msg_addr);
     }
@@ -56,7 +48,7 @@ int poll_wc(Socket *socket_, struct ibv_wc *send_wc) {       // 获取一个提�
     ibv_ack_cq_events(cq, 1);
 
     while(ibv_poll_cq(cq, 1, &wc) == 1) {
-        if(wc.opcode != IBV_WC_RECV){
+        if(wc.opcode == IBV_WC_SEND || wc.opcode == IBV_WC_RDMA_READ){
             if(send_wc != NULL) {
                 memcpy(send_wc, &wc, sizeof(wc));
             }
@@ -76,17 +68,12 @@ int poll_wc(Socket *socket_, struct ibv_wc *send_wc) {       // 获取一个提�
 
 int resolve_wr_queue(Socket *socket_) {               // 处理 wr_queue 中的 wc
     struct ibv_wc *wc;
-    void *buffer;
     int flag = 1, stat;
+    Message *recv_msg = Message_create(NULL, 0, 0);
 
     while((wc = (struct ibv_wc *)queue_pop(socket_->wr_queue)) != NULL) {
-        if((stat = recv_wc_handle(socket_, wc, &buffer)) == RDMAREADSOLVED || stat == RDMASNDMORE) {
-            Message *msg = (Message *)malloc(sizeof(Message));
-            if(stat == RDMASNDMORE) {
-                queue_push(socket_->recv_queue, Message_create(buffer, sizeof(buffer), SNDMORE_FLAG));
-            } else {
-                queue_push(socket_->recv_queue, Message_create(buffer, sizeof(buffer), 0));
-            }
+        if((stat = recv_wc_handle(socket_, wc, recv_msg)) == RDMAREADSOLVED) {
+            queue_push(socket_->recv_queue, recv_msg);
             flag = 0;
         } else if (stat == ERRORWC) {
             return -1;
@@ -99,7 +86,7 @@ int resolve_wr_queue(Socket *socket_) {               // 处理 wr_queue 中的 
 
 
 
-int recv_wc_handle(Socket *socket_, struct ibv_wc *wc, void **read_buffer) {         // 处理每一个recv的wc
+int recv_wc_handle(Socket *socket_, struct ibv_wc *wc, Message *recv_msg) {         // 处理每一个recv的wc
     if(wc->status != IBV_WC_SUCCESS) {
         // printf("err recv code: %d\n", wc->status);
         // die("quit");
@@ -112,20 +99,23 @@ int recv_wc_handle(Socket *socket_, struct ibv_wc *wc, void **read_buffer) {    
     rinfo = (Rinfo *)wc->wr_id;
     md_buffer = (MetaData *)rinfo->buffer;
 
-    if(md_buffer->type == METADATA_NORMAL || md_buffer->type == METADATA_SNDMORE) {
+    if(md_buffer->type == METADATA_NORMAL) {
         struct ibv_mr *read_mr;
-        *read_buffer = malloc(md_buffer->length);
+
+        recv_msg->buffer = malloc(md_buffer->length);
+        recv_msg->length = md_buffer->length;
+        recv_msg->flag = md_buffer->flag;
             
         TEST_Z(read_mr = ibv_reg_mr(
             socket_->pd,
-            *read_buffer,
+            recv_msg->buffer,
             md_buffer->length,
             IBV_ACCESS_LOCAL_WRITE | IBV_ACCESS_REMOTE_WRITE | IBV_ACCESS_REMOTE_READ));
 
         TEST_NZ(rdma_post_read(
                 socket_->id, 
                 NULL, 
-                *read_buffer, 
+                recv_msg->buffer, 
                 md_buffer->length, 
                 read_mr, 
                 IBV_SEND_SIGNALED,
@@ -161,27 +151,21 @@ int recv_wc_handle(Socket *socket_, struct ibv_wc *wc, void **read_buffer) {    
         sizeof(MetaData), 
         (struct ibv_mr *)rinfo->mr));
 
-        if(md_buffer->type == METADATA_SNDMORE){
-            return RDMASNDMORE;
-        }
-
         return RDMAREADSOLVED;
 
     } else if (md_buffer->type == METADATA_ACK) {
 
-        // pthread_mutex_lock(&socket_->peer_buff_count_lock);
+        pthread_mutex_lock(&socket_->peer_buff_count_lock);
         socket_->peer_buff_count ++;
-        // pthread_mutex_unlock(&socket_->peer_buff_count_lock);
+        pthread_mutex_unlock(&socket_->peer_buff_count_lock);
 
         ibv_dereg_mr((struct ibv_mr *)md_buffer->mr_addr);
         free((void *)md_buffer->msg_addr);
         md_buffer->msg_addr = NULL;
 
-        printf("%s: line: %d: mr_addr: %p\n", __FILE__, __LINE__, md_buffer->mr_addr);
-
-        // pthread_mutex_lock(&socket_->ack_counter_lock);
+        pthread_mutex_lock(&socket_->ack_counter_lock);
         socket_->ack_counter ++;
-        // pthread_mutex_unlock(&socket_->ack_counter_lock);
+        pthread_mutex_unlock(&socket_->ack_counter_lock);
 
         TEST_NZ(rdma_post_recv(socket_->id, 
         rinfo, 

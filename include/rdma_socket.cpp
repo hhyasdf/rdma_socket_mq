@@ -2,6 +2,7 @@
 #include "post_wr.h"
 #include "poll_wc.h"
 #include "init.h"
+#include "message.h"
 
 #include <unistd.h>
 #include <stdlib.h>
@@ -51,7 +52,7 @@ static int send_close_md(Socket *socket_) {
     pthread_mutex_unlock(&socket_->close_lock);
 
     struct ibv_wc wc;
-    struct ibv_mr *send_mr;;
+    struct ibv_mr *send_mr;
     MetaData metadata;
 
     memset(&metadata, 0, sizeof(metadata));
@@ -152,7 +153,7 @@ static void *wait_for_close(void *socket_) {
 }
 
 
-Socket *accept_(Socket *socket_, Receiver *receiver) {
+Socket *accept_(Socket *socket_, struct Receiver_ *receiver) {
 
     struct rdma_cm_event *event = NULL;
     struct rdma_event_channel *ec = socket_->ec;
@@ -160,8 +161,6 @@ Socket *accept_(Socket *socket_, Receiver *receiver) {
     struct rdma_cm_event event_copy;
     struct rdma_conn_param cm_params;
     
-    printf("%s :%d\n", __FILE__, __LINE__);
-
     while (rdma_get_cm_event(ec, &event) == 0) {
         
         // printf("%d\n", ec);
@@ -169,11 +168,11 @@ Socket *accept_(Socket *socket_, Receiver *receiver) {
         memcpy(&event_copy, event, sizeof(*event));
 
         rdma_ack_cm_event(event);
-        printf("%s :%d\n", __FILE__, __LINE__);
 
         if(event_copy.event == RDMA_CM_EVENT_CONNECT_REQUEST) {
             
-            new_socket_ = buildConnection(event_copy.id, receiver);
+            new_socket_ = buildConnection(event_copy.id);
+            new_socket_->receiver = receiver;
             ec = new_socket_->ec;
 
             build_params(&cm_params);
@@ -184,8 +183,6 @@ Socket *accept_(Socket *socket_, Receiver *receiver) {
 
             return new_socket_;
         }
-
-        printf("%s :%d\n", __FILE__, __LINE__);
     }
 }
 
@@ -211,7 +208,7 @@ Socket *connect_(Socket *socket_, char *address, char *port) {
             exit(0);
         } else if (event.event == RDMA_CM_EVENT_ADDR_RESOLVED) {
 		// printf("1\n");
-            new_socket_ = buildConnection(event.id, NULL);
+            new_socket_ = buildConnection(event.id);
             ec = new_socket_->ec;
             free(socket_);            
             rdma_resolve_route(event.id, TIMEOUT_IN_MS);
@@ -244,17 +241,8 @@ void close_(Socket *socket_) {                   // 释放socket结构体和其�
     // printf("I AM HERE !\n");
     // pthread_barrier_wait(&socket_->close_barrier);
     // printf("i am here !\n");
-    Message *msg;
-    struct ibv_wc *wc;
 
-    while((msg = (Message *)queue_pop(socket_->recv_queue)) != NULL) {
-        Message_destroy(msg);
-    }
     queue_destroy(socket_->recv_queue);
-    while((msg = (Message *)queue_pop(socket_->msg_queue)) != NULL) {
-        Message_destroy(msg);
-    }
-    queue_destroy(socket_->msg_queue);
     queue_destroy(socket_->wr_queue);
 
     pthread_mutex_destroy(&socket_->close_lock);
@@ -296,23 +284,20 @@ int send_(Socket *socket_, Message *msg) {      // 当一次性send操作数超�
     metadata.msg_addr = (uint64_t)msg_mr->addr;//(uint64_t)buffer_copy;
     metadata.rkey = msg_mr->rkey;
     metadata.mr_addr = (uint64_t)msg_mr;
-    if(msg->flag == SNDMORE_FLAG) {
-        metadata.type = METADATA_SNDMORE;
-    } else {
-        metadata.type = METADATA_NORMAL;
-    }
+    metadata.type = METADATA_NORMAL;
+    metadata.flag = msg->flag;
 
-    // pthread_mutex_lock(&socket_->peer_buff_count_lock);
+    pthread_mutex_lock(&socket_->peer_buff_count_lock);
     if(socket_->peer_buff_count <= 0) {
         poll_wc(socket_, NULL);
     }
-    // pthread_mutex_unlock(&socket_->peer_buff_count_lock);
+    pthread_mutex_unlock(&socket_->peer_buff_count_lock);
 
     send_mr = post_send_wr(socket_, &metadata);
 
-    // pthread_mutex_lock(&socket_->peer_buff_count_lock);
+    pthread_mutex_lock(&socket_->peer_buff_count_lock);
     socket_->peer_buff_count --;
-    // pthread_mutex_unlock(&socket_->peer_buff_count_lock);
+    pthread_mutex_unlock(&socket_->peer_buff_count_lock);
 
     while(poll_wc(socket_, &wc));
     if(wc.status != IBV_WC_SUCCESS) {
@@ -338,7 +323,7 @@ Message *recv_(Socket *socket_) {            // 用户提供指针地址，函�
     struct ibv_wc wc;
     void *wc_save;
     struct ibv_cq *cq;
-    Message *recv = NULL;
+    Message *recv_msg;
 
     if(pthread_mutex_trylock(&socket_->close_lock)) {
         return NULL;
@@ -359,9 +344,9 @@ Message *recv_(Socket *socket_) {            // 用户提供指针地址，函�
         socket_->close_flag = 1;
     }
 
-    if((recv = (Message *)queue_pop(socket_->recv_queue)) != NULL) {
+    if((recv_msg = (Message *)queue_pop(socket_->recv_queue)) != NULL) {
         return NULL;
-    } else if(pthread_mutex_trylock(&socket_->close_lock)) {    // 往下 recv 都为 NULL
+    } else if(pthread_mutex_trylock(&socket_->close_lock)) {    // 往下 *recv_buffer 都为 NULL
         return NULL;
     } else if (socket_->close_flag == 1) {
         return NULL;                                   

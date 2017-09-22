@@ -1,28 +1,25 @@
-#ifndef RDMA_SOCKET
-#define RDMA_SOCKET
-
-
 #include <rdma/rdma_cma.h>
 #include <stdint.h>
 #include "queue.h"
 #include <netdb.h>
 #include <pthread.h>
-#include "receiver.h"
 #include "message.h"
+#include "receiver.h"
 
 
-#define METADATA_ACK 101
-#define METADATA_NORMAL 102
-#define METADATA_CLOSE 103
-#define METADATA_SNDMORE 104
+#ifndef RDMA_SOCKET
+#define RDMA_SOCKET
+
+#define METADATA_ACK 0
+#define METADATA_NORMAL 1
+#define METADATA_CLOSE 2
 
 #define TIMEOUT_IN_MS 500
 #define BLOCKRECV 0
 #define NOTBLOCKRECV 1
 
-#define SNDMORE_FLAG 20
 
-#define MDBUFFERSIZE 100                // 缓冲区大小
+#define MDBUFFERSIZE 10                // 缓冲区大小
 
 
 #define TEST_NZ(x) do { if ( (x)) die("error: " #x " failed (returned non-zero)." ); } while (0)
@@ -37,7 +34,7 @@ typedef struct Msg_ {
 
 typedef struct MetaData_ {
     int type;                              //  METADATA_ACK 和 #define METADATA_NORMAL 和 #define METADATA_CLOSE
-    int tag;
+    int flag;
     size_t length;                         
     uint64_t msg_addr;
     uint64_t mr_addr;
@@ -60,8 +57,7 @@ typedef struct Socket_ {
 
     Queue *recv_queue;
     Queue *wr_queue;
-
-    Queue *msg_queue;
+    Queue *more_queue;
 
     MetaData *metaData_buffer;
 

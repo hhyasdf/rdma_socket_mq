@@ -21,23 +21,22 @@ Receiver *receiver_build() {
 
 static void *recv_process(void *listen) {
     Socket *l = (Socket *)listen;
-    Queue *msg_queue = l->msg_queue;
+    Queue *more_queue = l->more_queue;
     Message *msg; 
     while(1) {
         msg = recv_(l);
 
         if(msg == NULL){
-            queue_push_q(l->receiver->recv_queue, msg_queue);
             break;
         }
 
         printf("recv a msg: %s\n", msg->buffer);
 
-        if (msg->flag == SNDMORE_FLAG) {
-            queue_push(l->msg_queue, (void *)msg);
+        if (msg->flag == SND_MORE_FLAG) {
+            queue_push(l->more_queue, (void *)msg);
         } else {
-            if(!queue_if_empty(msg_queue)) {
-                queue_push_q(l->receiver->recv_queue, msg_queue);
+            if(!queue_if_empty(more_queue)) {
+                queue_push_q(l->recv_queue, more_queue);
             }
             queue_push(l->receiver->recv_queue, (void *)msg);
 

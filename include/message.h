@@ -1,6 +1,9 @@
 #ifndef MSG
 #define MSG
 
+
+#define SND_MORE_FLAG 128
+
 typedef struct Message_{
     void *buffer;
     int flag;
