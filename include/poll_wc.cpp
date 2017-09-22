@@ -11,6 +11,7 @@
 #define RDMAREADSOLVED 8
 #define ACKSOLVED 9
 #define ERRORWC 10
+#define RDMASNDMORE 11
 
 
 void close_handle(Socket *socket_, struct ibv_wc *wc) {                          // 关闭时处理wc的函数
@@ -73,8 +74,13 @@ int resolve_wr_queue(Socket *socket_) {               // 处理 wr_queue 中的 
     int flag = 1, stat;
 
     while((wc = (struct ibv_wc *)queue_pop(socket_->wr_queue)) != NULL) {
-        if((stat = recv_wc_handle(socket_, wc, &buffer)) == RDMAREADSOLVED) {
-            queue_push(socket_->recv_queue, buffer);
+        if((stat = recv_wc_handle(socket_, wc, &buffer)) == RDMAREADSOLVED || stat == RDMASNDMORE) {
+            Message *msg = (Message *)malloc(sizeof(Message));
+            if(stat == RDMASNDMORE) {
+                queue_push(socket_->recv_queue, Message_create(buffer, sizeof(buffer), SNDMORE_FLAG));
+            } else {
+                queue_push(socket_->recv_queue, Message_create(buffer, sizeof(buffer), 0));
+            }
             flag = 0;
         } else if (stat == ERRORWC) {
             return -1;
@@ -100,7 +106,7 @@ int recv_wc_handle(Socket *socket_, struct ibv_wc *wc, void **read_buffer) {    
     rinfo = (Rinfo *)wc->wr_id;
     md_buffer = (MetaData *)rinfo->buffer;
 
-    if(md_buffer->type == METADATA_NORMAL) {
+    if(md_buffer->type == METADATA_NORMAL || md_buffer->type == METADATA_SNDMORE) {
         struct ibv_mr *read_mr;
         *read_buffer = malloc(md_buffer->length);
             
@@ -148,6 +154,10 @@ int recv_wc_handle(Socket *socket_, struct ibv_wc *wc, void **read_buffer) {    
         md_buffer, 
         sizeof(MetaData), 
         (struct ibv_mr *)rinfo->mr));
+
+        if(md_buffer->type == METADATA_SNDMORE){
+            return RDMASNDMORE;
+        }
 
         return RDMAREADSOLVED;
 

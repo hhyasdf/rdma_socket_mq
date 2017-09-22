@@ -36,12 +36,12 @@ int main(int argc, char** argv) {
 
     while(1) {
         listen = accept_(socket, NULL);
-        void *buffer = (void *)1;
+        Message *buffer = (Message *)1;
         
         // sleep(5);          // 测试缓冲计数 达到缓冲最大值时send会阻塞 默认是10
         // printf("ready\n");
         while(buffer != NULL){
-            recv_(listen, &buffer);
+            buffer = recv_(listen);
 
             if(buffer == NULL){
 
@@ -49,8 +49,8 @@ int main(int argc, char** argv) {
 
                 break;
             }
-            printf("%s\n", ((Message *)buffer)->buffer);
-            free(buffer);
+            printf("%s\n", buffer->buffer);
+            Message_destroy(buffer);
         }
 
         printf("\n");

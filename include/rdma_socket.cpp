@@ -51,7 +51,7 @@ static int send_close_md(Socket *socket_) {
     pthread_mutex_unlock(&socket_->close_lock);
 
     struct ibv_wc wc;
-    struct ibv_mr *send_mr;
+    struct ibv_mr *send_mr;;
     MetaData metadata;
 
     memset(&metadata, 0, sizeof(metadata));
@@ -244,8 +244,17 @@ void close_(Socket *socket_) {                   // 释放socket结构体和其�
     // printf("I AM HERE !\n");
     // pthread_barrier_wait(&socket_->close_barrier);
     // printf("i am here !\n");
+    Message *msg;
+    struct ibv_wc *wc;
 
+    while((msg = (Message *)queue_pop(socket_->recv_queue)) != NULL) {
+        Message_destroy(msg);
+    }
     queue_destroy(socket_->recv_queue);
+    while((msg = (Message *)queue_pop(socket_->msg_queue)) != NULL) {
+        Message_destroy(msg);
+    }
+    queue_destroy(socket_->msg_queue);
     queue_destroy(socket_->wr_queue);
 
     pthread_mutex_destroy(&socket_->close_lock);
@@ -257,17 +266,18 @@ void close_(Socket *socket_) {                   // 释放socket结构体和其�
 }
 
 
-int send_(Socket *socket_, const void *msg, size_t length) {      // 当一次性send操作数超过初始的缓冲区大小会被阻塞
+int send_(Socket *socket_, Message *msg) {      // 当一次性send操作数超过初始的缓冲区大小会被阻塞
 
     struct ibv_send_wr *bad_wr = NULL;
     struct ibv_mr *send_mr, *msg_mr;
     struct ibv_cq *cq;
     struct ibv_wc wc;
+    int length = msg->length;
     void *recv_buffer;
 
     void *buffer_copy = malloc(length);
 
-    memcpy(buffer_copy, msg, length);
+    memcpy(buffer_copy, msg->buffer, length);
 
     MetaData metadata;
 
@@ -286,7 +296,11 @@ int send_(Socket *socket_, const void *msg, size_t length) {      // 当一次�
     metadata.msg_addr = (uint64_t)msg_mr->addr;//(uint64_t)buffer_copy;
     metadata.rkey = msg_mr->rkey;
     metadata.mr_addr = (uint64_t)msg_mr;
-    metadata.type = METADATA_NORMAL;
+    if(msg->flag == SNDMORE_FLAG) {
+        metadata.type = METADATA_SNDMORE;
+    } else {
+        metadata.type = METADATA_NORMAL;
+    }
 
     // pthread_mutex_lock(&socket_->peer_buff_count_lock);
     if(socket_->peer_buff_count <= 0) {
@@ -319,15 +333,15 @@ int send_(Socket *socket_, const void *msg, size_t length) {      // 当一次�
 }
 
 
-void recv_(Socket *socket_, void **recv_buffer) {            // 用户提供指针地址，函数来填充 *recv_buffer,用户需要自己free 
+Message *recv_(Socket *socket_) {            // 用户提供指针地址，函数来填充 *recv_buffer,用户需要自己free 
     int flag = 1;
     struct ibv_wc wc;
     void *wc_save;
     struct ibv_cq *cq;
+    Message *recv = NULL;
 
     if(pthread_mutex_trylock(&socket_->close_lock)) {
-        *recv_buffer = NULL;
-        return ;
+        return NULL;
     }
     pthread_mutex_unlock(&socket_->close_lock);
 
@@ -345,12 +359,12 @@ void recv_(Socket *socket_, void **recv_buffer) {            // 用户提供指�
         socket_->close_flag = 1;
     }
 
-    if((*recv_buffer = queue_pop(socket_->recv_queue)) != NULL) {
-        return ;
-    } else if(pthread_mutex_trylock(&socket_->close_lock)) {    // 往下 *recv_buffer 都为 NULL
-        return ;
+    if((recv = (Message *)queue_pop(socket_->recv_queue)) != NULL) {
+        return NULL;
+    } else if(pthread_mutex_trylock(&socket_->close_lock)) {    // 往下 recv 都为 NULL
+        return NULL;
     } else if (socket_->close_flag == 1) {
-        return ;                                   
+        return NULL;                                   
     } else {
         pthread_mutex_unlock(&socket_->close_lock);                          
         // if(socket_->close_flag == 1){
@@ -358,8 +372,7 @@ void recv_(Socket *socket_, void **recv_buffer) {            // 用户提供指�
         // }
         while(flag == 1){
             if(poll_wc(socket_, NULL) == -1) {
-                *recv_buffer = NULL;
-                return ;
+                return NULL;
             }
             flag = resolve_wr_queue(socket_);
         }
@@ -368,7 +381,7 @@ void recv_(Socket *socket_, void **recv_buffer) {            // 用户提供指�
     if(flag == -1) { 
         socket_->close_flag = 1;                  // 断开连接会将 close_flag 设成 1
     }
-    *recv_buffer = queue_pop(socket_->recv_queue);
+    return (Message *)queue_pop(socket_->recv_queue);
 }
 
 

@@ -8,12 +8,13 @@
 #define THREAD_NUM 3
 
 void *send_process(void *socket){
-    Message msg;
-    Message_init(&msg, (void *)MSG, 0);
+    Message *msg;
+    msg = Message_create((void *)MSG, sizeof(MSG), 0);
 
     for(int i = 0; i < MSG_COUNT; i ++) {
         printf("Send a message: %s!\n", MSG);
-        send_((Socket *)socket, static_cast<void *>(&msg), sizeof(msg));
+        send_((Socket *)socket, msg);
+        Message_destroy(msg);
     }
     close_((Socket *)socket);
 }

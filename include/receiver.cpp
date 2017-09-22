@@ -24,7 +24,7 @@ static void *recv_process(void *listen) {
     Queue *msg_queue = l->msg_queue;
     Message *msg; 
     while(1) {
-        recv_(l, (void **)&msg);
+        msg = recv_(l);
 
         if(msg == NULL){
             queue_push_q(l->receiver->recv_queue, msg_queue);

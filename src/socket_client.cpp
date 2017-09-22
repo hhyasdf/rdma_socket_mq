@@ -21,10 +21,11 @@ int main(int argc, char **argv) {
         scanf("%c",&ch);
         while(ch=='\n') scanf("%c",&ch);
         // send msg
-        Message msg;
-        Message_init(&msg, (void *)MSG, 0);
-        if(send_(connect,&msg,sizeof(Message)))break;
-        printf("%s\n", msg.buffer);
+        Message *msg;
+        msg = Message_create((void *)MSG, sizeof(MSG), 0);
+        if(send_(connect, msg))break;
+        printf("%s\n", msg->buffer);
+        Message_destroy(msg);
     }
     
     close_(connect);

@@ -14,13 +14,13 @@
 #define METADATA_ACK 0
 #define METADATA_NORMAL 1
 #define METADATA_CLOSE 2
+#define METADATA_SNDMORE 3
 
 #define TIMEOUT_IN_MS 500
 #define BLOCKRECV 0
 #define NOTBLOCKRECV 1
 
-#define SNDMORE_FLAG 10086
-
+#define SNDMORE_FLAG 20
 
 #define MDBUFFERSIZE 100                // 缓冲区大小
 
@@ -94,8 +94,8 @@ Socket *connect_(Socket *socket_, char *address, char *port);
 Socket *accept_(Socket *socket_, struct Receiver_ *receiver);
 void bind_(Socket *socket_, void *addr, int protocol);
 void close_(Socket *socket_);
-void recv_(Socket *socket_, void **recv_buffer);
-int send_(Socket *socket_, const void *msg, size_t length);
+Message *recv_(Socket *socket_);
+int send_(Socket *socket_, Message *msg);
 
 
 
