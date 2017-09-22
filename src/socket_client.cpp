@@ -23,7 +23,7 @@ int main(int argc, char **argv) {
         // send msg
         Message msg;
         Message_init(&msg, (void *)MSG, 0);
-        if(send_(connect,&msg,MSG_LEN))break;
+        if(send_(connect,&msg,sizeof(Message)))break;
         printf("%s\n", msg.buffer);
     }
     
