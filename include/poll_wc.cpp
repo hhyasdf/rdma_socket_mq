@@ -109,7 +109,7 @@ int recv_wc_handle(Socket *socket_, struct ibv_wc *wc, Message *recv_msg) {     
         recv_msg->length = md_buffer->length;
         recv_msg->flag = md_buffer->flag;
 
-        printf("buffer: %p, length: %d, flag: %d\n", recv_msg->buffer, recv_msg->length, recv_msg->flag);
+        // printf("buffer: %p, length: %d, flag: %d\n", recv_msg->buffer, recv_msg->length, recv_msg->flag);
             
         TEST_Z(read_mr = ibv_reg_mr(
             socket_->pd,
@@ -168,7 +168,7 @@ int recv_wc_handle(Socket *socket_, struct ibv_wc *wc, Message *recv_msg) {     
         free((void *)md_buffer->msg_addr);
         md_buffer->msg_addr = NULL;
 
-        printf("line: %d, mr_addr: %p\n", __LINE__, md_buffer->mr_addr);
+        // printf("line: %d, mr_addr: %p\n", __LINE__, md_buffer->mr_addr);
         md_buffer->mr_addr = NULL;
 
         pthread_mutex_lock(&socket_->ack_counter_lock);
