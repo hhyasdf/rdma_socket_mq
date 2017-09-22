@@ -16,10 +16,16 @@
 
 void close_handle(Socket *socket_, struct ibv_wc *wc) {                          // 关闭时处理wc的函数
     Rinfo *rinfo  = (Rinfo *)wc->wr_id;
-    MetaData *recv_buffer = (MetaData *)rinfo->buffer;;
+    if(rinfo == NULL) {
+        return ;
+    }
+    MetaData *recv_buffer = (MetaData *)rinfo->buffer;
+    if(recv_buffer == NULL) {
+        return ;
+    }
 
     if(recv_buffer->type == METADATA_ACK) {
-        printf("%s: line: %d: mr_addr: %p\n", __FILE__, __LINE__, ((struct ibv_mr *)recv_buffer->mr_addr));
+        // printf("%s: line: %d: mr_addr: %p\n", __FILE__, __LINE__, ((struct ibv_mr *)recv_buffer->mr_addr));
         ibv_dereg_mr((struct ibv_mr *)recv_buffer->mr_addr);
         free((void *)recv_buffer->msg_addr);
     }
