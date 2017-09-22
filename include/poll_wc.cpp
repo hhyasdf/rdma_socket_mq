@@ -19,6 +19,7 @@ void close_handle(Socket *socket_, struct ibv_wc *wc) {                         
     MetaData *recv_buffer = (MetaData *)rinfo->buffer;;
 
     if(recv_buffer->type == METADATA_ACK) {
+        printf("mr_addr: %p\n", ((struct ibv_mr *)recv_buffer->mr_addr));
         ibv_dereg_mr((struct ibv_mr *)recv_buffer->mr_addr);
         free((void *)recv_buffer->msg_addr);
     }
