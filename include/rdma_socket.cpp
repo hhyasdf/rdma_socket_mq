@@ -350,6 +350,7 @@ Message *recv_(Socket *socket_) {            // 用户提供指针地址，函�
     Node *head = socket_->recv_queue->head, *tail = socket_->recv_queue->tail;
     while(head != NULL) {
         printf("node :%p\n", ((Message *)head->buffer)->buffer);
+        head = head->next;
     }
 
     if((recv_msg = (Message *)queue_pop(socket_->recv_queue)) != NULL) {
