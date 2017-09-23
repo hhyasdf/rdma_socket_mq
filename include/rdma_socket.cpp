@@ -264,7 +264,7 @@ void close_(Socket *socket_) {                   // 释放socket结构体和其�
     pthread_mutex_destroy(&socket_->metadata_counter_lock);
     pthread_mutex_destroy(&socket_->ack_counter_lock);
 
-    free(socket_);
+    // free(socket_);
 }
 
 
