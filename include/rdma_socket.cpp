@@ -225,7 +225,9 @@ Socket *connect_(Socket *socket_, char *address, char *port) {
             pthread_create(&(new_socket_->close_pthread), NULL, wait_for_close, new_socket_);
 
             return new_socket_;
-        }else {
+        } else if (event.event == RDMA_CM_EVENT_DISCONNECTED) {
+            return NULL;
+        } else {
             printf("event: %d\n", event.event);
             return NULL;
         }
@@ -235,6 +237,7 @@ Socket *connect_(Socket *socket_, char *address, char *port) {
 
 void close_(Socket *socket_) {                   // 释放socket结构体和其中的两个动态分配的队列
     if(socket_->pd == NULL) {
+        rdma_disconnect(socket_->id);
         free(socket_);
         return;
     }
