@@ -29,8 +29,8 @@ int main(int argc, char **argv) {
     
     socket = socket_(RDMA_PS_TCP);
 
-    connect = connect_(socket, argv[1], argv[2]);
     for(int i = 0; i < THREAD_NUM; i ++){
+        connect = connect_(socket, argv[1], argv[2]);
         pthread_create(p_id + i, NULL, send_process, connect);
     }
     
