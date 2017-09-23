@@ -18,7 +18,7 @@ void close_handle(Socket *socket_, struct ibv_wc *wc) {                         
     MetaData *recv_buffer = (MetaData *)rinfo->buffer;
 
     if(recv_buffer->type == METADATA_ACK) {
-        printf("line: %d, mr_addr: %p\n", __LINE__, recv_buffer->mr_addr);
+        // printf("line: %d, mr_addr: %p\n", __LINE__, recv_buffer->mr_addr);
         if((struct ibv_mr *)recv_buffer->mr_addr != NULL) {
             ibv_dereg_mr((struct ibv_mr *)recv_buffer->mr_addr);
         }
@@ -77,8 +77,6 @@ int resolve_wr_queue(Socket *socket_) {               // 处理 wr_queue 中的 
     while((wc = (struct ibv_wc *)queue_pop(socket_->wr_queue)) != NULL) {
         if((stat = recv_wc_handle(socket_, wc, &recv_msg)) == RDMAREADSOLVED) {
             queue_push(socket_->recv_queue, recv_msg);
-            printf("%d: buffer: %s, length: %d, flag: %d\n", __LINE__, recv_msg->buffer, recv_msg->length, recv_msg->flag);
-            printf("num of recv_queue: %d\n", num_of_queue(socket_->recv_queue));
             flag = 0;
         } else if (stat == ERRORWC) {
             return -1;
@@ -109,7 +107,7 @@ int recv_wc_handle(Socket *socket_, struct ibv_wc *wc, Message **recv_msg) {    
 
         *recv_msg = Message_create(malloc(md_buffer->length), md_buffer->length, md_buffer->flag);
 
-        printf("%d: buffer: %s, length: %d, flag: %d\n", __LINE__, (*recv_msg)->buffer, (*recv_msg)->length, (*recv_msg)->flag);
+        // printf("%d: buffer: %s, length: %d, flag: %d\n", __LINE__, (*recv_msg)->buffer, (*recv_msg)->length, (*recv_msg)->flag);
             
         TEST_Z(read_mr = ibv_reg_mr(
             socket_->pd,
