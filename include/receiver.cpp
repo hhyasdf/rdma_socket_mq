@@ -48,15 +48,21 @@ static void *recv_process(void *listen) {
 static void *listen_process(void *re) {
     Socket *listen = NULL;
     pthread_t p_id;
+    pthread_attr_t attr;
+    pthread_attr_init(&attr);
+    pthread_attr_setdetachstate(&attr, PTHREAD_CREATE_DETACHED);
 
     while(1) {
         // printf("%s :%d\n", __FILE__, __LINE__);
         listen = accept_(((Receiver *)re)->listener, (Receiver *)re);
+        if(listen == NULL) {
+            break;
+        }
         // printf("%s :%d\n", __FILE__, __LINE__);
         listen->receiver = (Receiver *)re;
         
         queue_push(((Receiver *)re)->socket_queue, static_cast<void *>(listen));
-        pthread_create(&p_id, NULL, recv_process, (void *)listen);
+        pthread_create(&p_id, &attr, recv_process, (void *)listen);
     }
 }
 
@@ -64,9 +70,6 @@ static void *listen_process(void *re) {
 void receiver_bind(Receiver* re, int port) {
     struct sockaddr_in addr;
     pthread_t p_id;
-    pthread_attr_t attr;
-    pthread_attr_init(&attr);
-    pthread_attr_setdetachstate(&attr, PTHREAD_CREATE_DETACHED);
 
     memset(&addr, 0, sizeof(addr));
     addr.sin_port = htons(port);
@@ -80,7 +83,7 @@ void receiver_bind(Receiver* re, int port) {
     listen_(socket, 100);
     re->listener = socket;
 
-    pthread_create(&static_cast<Receiver *>(re)->p_id, &attr, listen_process, (void *)re);
+    pthread_create(&static_cast<Receiver *>(re)->p_id, NULL, listen_process, (void *)re);
 }
 
 Message *receiver_recv(Receiver* re) {
@@ -102,5 +105,7 @@ void receiver_close(Receiver *re) {
     }
     queue_destroy(re->socket_queue);
     queue_destroy(re->recv_queue);
+
+    pthread_join(re->p_id, NULL);
 }
 

@@ -177,11 +177,12 @@ Socket *accept_(Socket *socket_, struct Receiver_ *receiver) {
 
             build_params(&cm_params);
             rdma_accept(new_socket_->id, &cm_params);
-        } 
-        else if (event_copy.event == RDMA_CM_EVENT_ESTABLISHED) {
+        } else if (event_copy.event == RDMA_CM_EVENT_ESTABLISHED) {
             pthread_create(&new_socket_->close_pthread, NULL, wait_for_close, new_socket_);
 
             return new_socket_;
+        } else if (event_copy.event == RDMA_CM_EVENT_DISCONNECTED) {
+            return NULL;
         }
     }
 }
