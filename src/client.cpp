@@ -14,6 +14,7 @@ void *send_process(void *socket){
     for(int i = 0; i < MSG_COUNT; i ++) {
         msg = Message_create((void *)MSG, sizeof(MSG), 0);
         printf("Send a message: %s!\n", MSG);
+        sleep(5);
         send_((Socket *)socket, msg);
         free(msg);
     }
@@ -32,8 +33,7 @@ int main(int argc, char **argv) {
     for(int i = 0; i < THREAD_NUM; i ++){
         connect = connect_(socket, argv[1], argv[2]);
         printf("connect : %p\n", connect);
-        // pthread_create(p_id + i, NULL, send_process, connect);
-        close_(connect);
+        pthread_create(p_id + i, NULL, send_process, connect);
     }
     
     // for(int i = 0; i < THREAD_NUM; i ++){
