@@ -195,15 +195,15 @@ Socket *accept_(Socket *socket_, struct Receiver_ *receiver) {
 }
 
 
-Socket *connect_(Socket *socket_, char *address, char *port) {         
+int connect_(Socket **socket_, char *address, char *port) {         
     
     struct addrinfo *addr;
     TEST_NZ(getaddrinfo(address, port, NULL, &addr));
-    rdma_resolve_addr(socket_->id, NULL, addr->ai_addr, TIMEOUT_IN_MS);
+    rdma_resolve_addr((*socket_)->id, NULL, addr->ai_addr, TIMEOUT_IN_MS);
 
     struct rdma_cm_event *g_event = NULL;
     struct rdma_conn_param con_params;
-    struct rdma_event_channel *ec = socket_->ec;
+    struct rdma_event_channel *ec = (*socket_)->ec;
     Socket *new_socket_;
     struct rdma_cm_event event;
 
@@ -218,7 +218,8 @@ Socket *connect_(Socket *socket_, char *address, char *port) {
         // printf("1\n");
             new_socket_ = buildConnection(event.id);
             ec = new_socket_->ec;
-            // free(socket_);            
+            free(*socket_);
+            *socket_ = new_socket_;            
             rdma_resolve_route(event.id, TIMEOUT_IN_MS);
         } else if (event.event == RDMA_CM_EVENT_ROUTE_RESOLVED) {
         // printf("2\n");
@@ -229,12 +230,12 @@ Socket *connect_(Socket *socket_, char *address, char *port) {
             
             pthread_create(&(new_socket_->close_pthread), NULL, wait_for_close, new_socket_);
 
-            return new_socket_;
+            return 1;
         } else if (event.event == RDMA_CM_EVENT_DISCONNECTED) {
-            return NULL;
+            return 0;
         } else {
             printf("event: %d\n", event.event);
-            return NULL;
+            return 0;
         }
     }
 }

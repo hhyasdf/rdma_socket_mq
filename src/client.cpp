@@ -25,16 +25,14 @@ void *send_process(void *socket){
 
 int main(int argc, char **argv) {
     //int msg_len, 
-    Socket *socket, *connect;
+    Socket *socket;
     pthread_t p_id[THREAD_NUM];
-    
-    
 
     for(int i = 0; i < THREAD_NUM; i ++){
         socket = socket_(RDMA_PS_TCP);
-        connect = connect_(socket, argv[1], argv[2]);
+        connect_(&socket, argv[1], argv[2]);
         printf("connect : %p\n", connect);
-        pthread_create(p_id + i, NULL, send_process, connect);
+        pthread_create(p_id + i, NULL, send_process, socket);
     }
     
     for(int i = 0; i < THREAD_NUM; i ++){
