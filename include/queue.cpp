@@ -63,7 +63,7 @@ void *queue_pop(Queue *queue) {
 
     pthread_mutex_unlock(&queue->queue_lock);
 
-    printf("queue %p pop %p\n", queue, buffer);
+    printf("queue %p push %p\n", queue, buffer);
     return buffer;
 }
 
