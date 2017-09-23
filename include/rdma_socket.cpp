@@ -347,6 +347,11 @@ Message *recv_(Socket *socket_) {            // 用户提供指针地址，函�
     }
 
     printf("recv_queue num : %d\n", num_of_queue(socket_->recv_queue));
+    Node *head = socket_->recv_queue->head, *tail = socket_->recv_queue->tail;
+    while(head != NULL) {
+        printf("node :%p\n", ((Message *)head->buffer)->buffer);
+    }
+
     if((recv_msg = (Message *)queue_pop(socket_->recv_queue)) != NULL) {
         printf("%s: line: %d\n", __FILE__, __LINE__);
         printf("%s %d: buffer: %s, length: %d, flag: %d\n", __FILE__, __LINE__, recv_msg->buffer, recv_msg->length, recv_msg->flag);        
