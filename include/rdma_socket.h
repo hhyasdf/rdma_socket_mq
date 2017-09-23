@@ -86,7 +86,7 @@ void die(char *msg);
 
 Socket* socket_(enum rdma_port_space type);
 void listen_(Socket *socket_, int backlog);
-int connect_(Socket **socket_, char *address, char *port);
+Socket *connect_(Socket *socket_, char *address, char *port);
 Socket *accept_(Socket *socket_, struct Receiver_ *receiver);
 void bind_(Socket *socket_, void *addr, int protocol);
 void close_(Socket *socket_);
