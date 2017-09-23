@@ -72,10 +72,10 @@ int poll_wc(Socket *socket_, struct ibv_wc *send_wc) {       // 获取一个提�
 int resolve_wr_queue(Socket *socket_) {               // 处理 wr_queue 中的 wc
     struct ibv_wc *wc;
     int flag = 1, stat;
-    Message *recv_msg = Message_create(NULL, 0, 0);
+    Message *recv_msg = NULL;
 
     while((wc = (struct ibv_wc *)queue_pop(socket_->wr_queue)) != NULL) {
-        if((stat = recv_wc_handle(socket_, wc, recv_msg)) == RDMAREADSOLVED) {
+        if((stat = recv_wc_handle(socket_, wc, &recv_msg)) == RDMAREADSOLVED) {
             queue_push(socket_->recv_queue, recv_msg);
             printf("%d: buffer: %s, length: %d, flag: %d\n", __LINE__, recv_msg->buffer, recv_msg->length, recv_msg->flag);
             printf("num of recv_queue: %d\n", num_of_queue(socket_->recv_queue));
@@ -91,7 +91,7 @@ int resolve_wr_queue(Socket *socket_) {               // 处理 wr_queue 中的 
 
 
 
-int recv_wc_handle(Socket *socket_, struct ibv_wc *wc, Message *recv_msg) {         // 处理每一个recv的wc
+int recv_wc_handle(Socket *socket_, struct ibv_wc *wc, Message **recv_msg) {         // 处理每一个recv的wc
     if(wc->status != IBV_WC_SUCCESS) {
         // printf("err recv code: %d\n", wc->status);
         // die("quit");
@@ -107,22 +107,20 @@ int recv_wc_handle(Socket *socket_, struct ibv_wc *wc, Message *recv_msg) {     
     if(md_buffer->type == METADATA_NORMAL) {
         struct ibv_mr *read_mr;
 
-        recv_msg->buffer = malloc(md_buffer->length);
-        recv_msg->length = md_buffer->length;
-        recv_msg->flag = md_buffer->flag;
+        *recv_msg = Message_create(malloc(md_buffer->length), md_buffer->length, md_buffer->flag);
 
-        printf("%d: buffer: %s, length: %d, flag: %d\n", __LINE__, recv_msg->buffer, recv_msg->length, recv_msg->flag);
+        printf("%d: buffer: %s, length: %d, flag: %d\n", __LINE__, (*recv_msg)->buffer, (*recv_msg)->length, (*recv_msg)->flag);
             
         TEST_Z(read_mr = ibv_reg_mr(
             socket_->pd,
-            recv_msg->buffer,
+            (*recv_msg)->buffer,
             md_buffer->length,
             IBV_ACCESS_LOCAL_WRITE | IBV_ACCESS_REMOTE_WRITE | IBV_ACCESS_REMOTE_READ));
 
         TEST_NZ(rdma_post_read(
                 socket_->id, 
                 NULL, 
-                recv_msg->buffer, 
+                (*recv_msg)->buffer, 
                 md_buffer->length, 
                 read_mr, 
                 IBV_SEND_SIGNALED,
