@@ -50,7 +50,5 @@ int main(int argc, char** argv) {
         free(buffer);
     }
 
-    printf("\n");
-
     close_(listen);
 }

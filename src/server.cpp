@@ -17,6 +17,8 @@ int main(int argc, char** argv) {
     while(1) {
         msg = receiver_recv(re);
         printf("Get a message : %s\n", msg->buffer);
+        free(msg);
+        free(msg->buffer);
         msg = NULL;
     }
 }
