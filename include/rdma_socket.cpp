@@ -215,13 +215,13 @@ Socket *connect_(Socket *socket_, char *address, char *port) {
             printf("RDMA_CM_EVENT_ADDR_ERROR");
             exit(0);
         } else if (event.event == RDMA_CM_EVENT_ADDR_RESOLVED) {
-		// printf("1\n");
+        // printf("1\n");
+            new_socket_ = buildConnection(event.id);
             ec = new_socket_->ec;
             // free(socket_);            
             rdma_resolve_route(event.id, TIMEOUT_IN_MS);
         } else if (event.event == RDMA_CM_EVENT_ROUTE_RESOLVED) {
         // printf("2\n");
-            new_socket_ = buildConnection(event.id);
             build_params(&con_params);
             rdma_connect(event.id, &con_params);
         } else if (event.event == RDMA_CM_EVENT_ESTABLISHED) {
