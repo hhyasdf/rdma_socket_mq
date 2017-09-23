@@ -82,7 +82,7 @@ void queue_push_q(Queue *queue, Queue *q) {
         } else {
             queue->head = q->head;
         }
-    queue->tail = q->tail;
+        queue->tail = q->tail;
     }
     
     pthread_mutex_unlock(&queue->queue_lock);
