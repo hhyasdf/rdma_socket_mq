@@ -349,7 +349,7 @@ Message *recv_(Socket *socket_) {            // 用户提供指针地址，函�
     printf("recv_queue num : %d\n", num_of_queue(socket_->recv_queue));
     Node *head = socket_->recv_queue->head, *tail = socket_->recv_queue->tail;
     while(head != NULL) {
-        printf("node :%p\n", ((Message *)head->buffer));
+        printf("node buffer: %s\n", ((Message *)head->buffer)->buffer);
         head = head->next;
     }
 
