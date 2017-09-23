@@ -265,9 +265,9 @@ int send_(Socket *socket_, Message *msg) {      // 当一次性send操作数超�
 
     void *buffer_copy = malloc(length);
 
-    msg->buffer = buffer_copy;
-
     memcpy(buffer_copy, msg->buffer, length);
+
+    msg->buffer = buffer_copy;
 
     MetaData metadata;
 
