@@ -23,12 +23,10 @@ int main(int argc, char **argv) {
         while(ch=='\n') scanf("%c",&ch);
         // send msg
         Message *msg;
-        char *buffer = (char *)malloc(sizeof(MSG));
-        memcpy(buffer, MSG, sizeof(MSG));
-        msg = Message_create(buffer, sizeof(MSG), 0);
+        msg = Message_create((void *)MSG, sizeof(MSG), 0);
         if(send_(connect, msg))break;
         printf("%s\n", msg->buffer);
-        Message_destroy(msg);
+        free(msg);
     }
     
     close_(connect);

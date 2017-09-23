@@ -267,8 +267,6 @@ int send_(Socket *socket_, Message *msg) {      // 当一次性send操作数超�
 
     memcpy(buffer_copy, msg->buffer, length);
 
-    msg->buffer = buffer_copy;
-
     MetaData metadata;
 
     if(pthread_mutex_trylock(&socket_->close_lock)) {

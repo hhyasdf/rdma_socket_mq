@@ -16,11 +16,3 @@ Message *Message_create(void *buffer, int length, int flag) {          // buffer
 bool Message_check_sndmore(Message *msg) {
     return (msg->flag == SND_MORE_FLAG);
 }
-
-void Message_destroy(Message *msg) {
-    if(msg->buffer != NULL) {
-        free(msg->buffer);
-    }
-    msg->buffer = NULL;
-    free(msg);
-}

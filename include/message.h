@@ -10,9 +10,7 @@ typedef struct Message_{
     int length;
 }Message;
 
-Message *Message_create(void *buffer, int length, int flag);       // buffer要自己动态分配
+Message *Message_create(void *buffer, int length, int flag);
 bool Message_check_sndmore(Message *msg);
-void Message_destroy(Message *msg);
-
 
 #endif

@@ -41,15 +41,13 @@ int main(int argc, char** argv) {
         // printf("ready\n");
     while(1){
         buffer = recv_(listen);
-
         if(buffer == NULL){
-
             printf("stop recv !\n");
-
             break;
         }
         printf("%s\n", buffer->buffer);
-        Message_destroy(buffer);
+        free(buffer->buffer);
+        free(buffer);
     }
 
     printf("\n");
