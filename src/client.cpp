@@ -31,7 +31,6 @@ int main(int argc, char **argv) {
 
     for(int i = 0; i < THREAD_NUM; i ++){
         connect = connect_(socket, argv[1], argv[2]);
-        sleep(3);
         pthread_create(p_id + i, NULL, send_process, connect);
     }
     

@@ -183,6 +183,7 @@ Socket *accept_(Socket *socket_, struct Receiver_ *receiver) {
         } else if (event_copy.event == RDMA_CM_EVENT_ESTABLISHED) {
             pthread_create(&new_socket_->close_pthread, NULL, wait_for_close, new_socket_);
 
+            printf("success accept!\n");
             return new_socket_;
         } else if (event_copy.event == RDMA_CM_EVENT_DISCONNECTED) {
             return NULL;
