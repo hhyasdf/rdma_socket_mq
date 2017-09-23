@@ -18,6 +18,9 @@ bool Message_check_sndmore(Message *msg) {
 }
 
 void Message_destroy(Message *msg) {
-    free(msg->buffer);
+    if(msg->buffer != NULL) {
+        free(msg->buffer);
+    }
+    msg->buffer = NULL;
     free(msg);
 }
