@@ -116,7 +116,7 @@ static void *wait_for_close(void *socket_) {
 
             pthread_mutex_lock(&sock->close_lock);
 
-            printf("close: %p\n", sock->id);
+            printf("line %d : close: %p\n", __LINE__, sock->id);
             rdma_disconnect(sock->id);
             
             struct ibv_wc wc, *wc_save;
@@ -238,7 +238,7 @@ Socket *connect_(Socket *socket_, char *address, char *port) {
 
 void close_(Socket *socket_) {                   // 释放socket结构体和其中的两个动态分配的队列
     
-    printf("close: %p\n", socket_->id);
+    printf("line %d : close: %p\n", __LINE__, socket_->id);
     if(socket_->pd == NULL) {
         printf("pd == NULL\n");
         return;
