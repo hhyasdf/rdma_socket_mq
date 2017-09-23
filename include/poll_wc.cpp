@@ -78,6 +78,7 @@ int resolve_wr_queue(Socket *socket_) {               // 处理 wr_queue 中的 
         if((stat = recv_wc_handle(socket_, wc, recv_msg)) == RDMAREADSOLVED) {
             queue_push(socket_->recv_queue, recv_msg);
             printf("%d: buffer: %s, length: %d, flag: %d\n", __LINE__, recv_msg->buffer, recv_msg->length, recv_msg->flag);
+            printf("num of recv_queue: %d\n", num_of_queue(socket_->recv_queue));
             flag = 0;
         } else if (stat == ERRORWC) {
             return -1;

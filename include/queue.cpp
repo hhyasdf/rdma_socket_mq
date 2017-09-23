@@ -11,6 +11,7 @@ Queue *queue_init() {
 
     queue->head = NULL;
     queue->tail = NULL;
+    queue->node_num = 0;
     pthread_mutex_init(&queue->queue_lock, &attr);
 
     return queue;
@@ -32,6 +33,7 @@ void queue_push(Queue *queue, void *buffer) {
 
     queue->tail = new_node;
     new_node->next = NULL;
+    queue->node_num ++;
 
     pthread_mutex_unlock(&queue->queue_lock);
 }
@@ -57,6 +59,7 @@ void *queue_pop(Queue *queue) {
     }
 
     free(old_head);
+    queue->node_num --;
 
     pthread_mutex_unlock(&queue->queue_lock);
     return buffer;
@@ -86,4 +89,8 @@ void queue_push_q(Queue *queue, Queue *q) {
     }
     
     pthread_mutex_unlock(&queue->queue_lock);
+}
+
+int num_of_queue(Queue *queue) {
+    return queue->node_num;
 }
