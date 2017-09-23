@@ -116,7 +116,7 @@ static void *wait_for_close(void *socket_) {
 
             pthread_mutex_lock(&sock->close_lock);
 
-            printf("line %d : close: %p\n", __LINE__, sock->id);
+            // printf("line %d : close: %p\n", __LINE__, sock->id);
             rdma_disconnect(sock->id);
             
             struct ibv_wc wc, *wc_save;
