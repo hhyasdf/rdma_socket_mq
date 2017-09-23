@@ -4,7 +4,7 @@
 
 #define MSG_LEN 32
 #define MSG "A message from client!@#$%^&*()"
-#define MSG_COUNT 20
+#define MSG_COUNT 50
 
 int main(int argc, char **argv) {
     //int msg_len, 
@@ -17,7 +17,7 @@ int main(int argc, char **argv) {
     int i;
     char msg[31];
     memcpy(msg,MSG,MSG_LEN);
-    for(; 1;){
+    for(int i = 0; i < MSG_COUNT; i++){
         printf("Waiting for send command\n");
         scanf("%c",&ch);
         while(ch=='\n') scanf("%c",&ch);
