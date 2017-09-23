@@ -213,7 +213,7 @@ Socket *connect_(Socket *socket_, char *address, char *port) {
 		// printf("1\n");
             new_socket_ = buildConnection(event.id);
             ec = new_socket_->ec;
-            free(socket_);            
+            // free(socket_);            
             rdma_resolve_route(event.id, TIMEOUT_IN_MS);
         } else if (event.event == RDMA_CM_EVENT_ROUTE_RESOLVED) {
 		// printf("2\n");
@@ -235,6 +235,7 @@ Socket *connect_(Socket *socket_, char *address, char *port) {
 
 void close_(Socket *socket_) {                   // 释放socket结构体和其中的两个动态分配的队列
     if(socket_->pd == NULL) {
+        free(socket_);
         return;
     }
 
