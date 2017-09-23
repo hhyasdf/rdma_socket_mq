@@ -139,8 +139,6 @@ int recv_wc_handle(Socket *socket_, struct ibv_wc *wc, Message **recv_msg) {    
         rinfo->mr, 
         IBV_SEND_SIGNALED));
 
-        md_buffer->type = METADATA_NORMAL;
-
         while(poll_wc(socket_, &wc));
         if(wc.status != IBV_WC_SUCCESS) {
             printf("send ack error: %d!\n", wc.status);
@@ -152,6 +150,8 @@ int recv_wc_handle(Socket *socket_, struct ibv_wc *wc, Message **recv_msg) {    
         md_buffer, 
         sizeof(MetaData), 
         (struct ibv_mr *)rinfo->mr));
+
+        md_buffer->type = METADATA_NORMAL;
 
         return RDMAREADSOLVED;
 
