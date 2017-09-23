@@ -36,12 +36,12 @@ void queue_push(Queue *queue, void *buffer) {
     queue->node_num ++;
 
     pthread_mutex_unlock(&queue->queue_lock);
+
+    printf("queue %p pop %p\n", queue, buffer);
 }
 
 void *queue_pop(Queue *queue) {
     pthread_mutex_lock(&queue->queue_lock);
-
-    // printf("pop one!\n");
 
     Node *old_head = queue->head;
     if(old_head == NULL) {
@@ -62,6 +62,8 @@ void *queue_pop(Queue *queue) {
     queue->node_num --;
 
     pthread_mutex_unlock(&queue->queue_lock);
+
+    printf("queue %p pop %p\n", queue, buffer);
     return buffer;
 }
 
