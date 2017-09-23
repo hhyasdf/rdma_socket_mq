@@ -26,10 +26,9 @@ int main(int argc, char **argv) {
     //int msg_len, 
     Socket *socket, *connect;
     pthread_t p_id[THREAD_NUM];
-    
-    socket = socket_(RDMA_PS_TCP);
 
     for(int i = 0; i < THREAD_NUM; i ++){
+        socket = socket_(RDMA_PS_TCP);
         connect = connect_(socket, argv[1], argv[2]);
         printf("connect : %p\n", connect);
         pthread_create(p_id + i, NULL, send_process, connect);
