@@ -61,7 +61,7 @@ static int send_close_md(Socket *socket_) {
         }
         resolve_wr_queue(socket_);
     }
-    
+
     memset(&metadata, 0, sizeof(metadata));
     metadata.type = METADATA_CLOSE;
 
@@ -301,7 +301,7 @@ int send_(Socket *socket_, Message *msg) {      // 当一次性send操作数超�
 
     while(poll_wc(socket_, &wc));
     if(wc.status != IBV_WC_SUCCESS) {
-        printf("send erro: %d!\n", wc.status);
+        printf("send error: %d!\n", wc.status);
         return -1;        // 连接已断开
     }
     ibv_dereg_mr(send_mr);
