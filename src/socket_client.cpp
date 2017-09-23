@@ -8,12 +8,12 @@
 
 int main(int argc, char **argv) {
     //int msg_len, 
-    Socket *socket, *connect;
+    Socket *socket;
     char ch;
     
     socket = socket_(RDMA_PS_TCP);
 
-    connect = connect_(socket, argv[1], argv[2]);
+    connect_(&socket, argv[1], argv[2]);
     int i;
     char msg[31];
     memcpy(msg,MSG,MSG_LEN);
