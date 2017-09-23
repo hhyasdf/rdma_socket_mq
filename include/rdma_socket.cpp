@@ -218,7 +218,7 @@ int connect_(Socket **socket_, char *address, char *port) {
         // printf("1\n");
             new_socket_ = buildConnection(event.id);
             ec = new_socket_->ec;
-            free(socket_);
+            free(*socket_);
             *socket_ = new_socket_;
             rdma_resolve_route(event.id, TIMEOUT_IN_MS);
         } else if (event.event == RDMA_CM_EVENT_ROUTE_RESOLVED) {
