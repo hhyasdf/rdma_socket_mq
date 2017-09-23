@@ -253,7 +253,7 @@ void close_(Socket *socket_) {                   // 释放socket结构体和其�
         // printf("closed !\n");
     }
     pthread_join(socket_->close_pthread, NULL);
-    resolve_wr_queue(socket_);
+    // resolve_wr_queue(socket_);
     
     // printf("I AM HERE !\n");
     // pthread_barrier_wait(&socket_->close_barrier);
