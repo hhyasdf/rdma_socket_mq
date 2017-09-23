@@ -9,9 +9,9 @@
 
 void *send_process(void *socket){
     Message *msg;
-    msg = Message_create((void *)MSG, sizeof(MSG), 0);
 
     for(int i = 0; i < MSG_COUNT; i ++) {
+        msg = Message_create((void *)MSG, sizeof(MSG), 0);
         printf("Send a message: %s!\n", MSG);
         send_((Socket *)socket, msg);
         Message_destroy(msg);
