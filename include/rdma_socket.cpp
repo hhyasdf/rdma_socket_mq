@@ -23,10 +23,12 @@ Socket* socket_(enum rdma_port_space type) {
     TEST_NZ(rdma_create_id(ec, &id, NULL, type));    // type can be RDMA_PS_TCP or RDMA_PS_UDP
 
     Socket *socket_ = (Socket *)malloc(sizeof(Socket));
-    memset(socket_, 0, sizeof(Socket));
+    // memset(socket_, 0, sizeof(Socket));
     
     socket_->id = id;
     socket_->ec = ec;
+
+    socket_->pd = NULL;
 
     return socket_;
 }
