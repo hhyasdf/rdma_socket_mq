@@ -216,7 +216,6 @@ Socket *connect_(Socket *socket_, char *address, char *port) {
             exit(0);
         } else if (event.event == RDMA_CM_EVENT_ADDR_RESOLVED) {
 		// printf("1\n");
-            new_socket_ = buildConnection(event.id);
             ec = new_socket_->ec;
             // free(socket_);            
             rdma_resolve_route(event.id, TIMEOUT_IN_MS);
@@ -226,7 +225,7 @@ Socket *connect_(Socket *socket_, char *address, char *port) {
             rdma_connect(event.id, &con_params);
         } else if (event.event == RDMA_CM_EVENT_ESTABLISHED) {
 		// printf("3\n");
-            
+            new_socket_ = buildConnection(event.id);
             pthread_create(&(new_socket_->close_pthread), NULL, wait_for_close, new_socket_);
 
             return new_socket_;

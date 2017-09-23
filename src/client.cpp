@@ -36,8 +36,8 @@ int main(int argc, char **argv) {
         pthread_create(p_id + i, NULL, send_process, connect);
     }
     
-    // for(int i = 0; i < THREAD_NUM; i ++){
-    //     pthread_join(p_id[i], NULL);
-    // }
+    for(int i = 0; i < THREAD_NUM; i ++){
+        pthread_join(p_id[i], NULL);
+    }
     close_(socket);
 }
