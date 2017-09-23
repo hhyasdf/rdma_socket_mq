@@ -252,9 +252,9 @@ void close_(Socket *socket_) {                   // 释放socket结构体和其�
         rdma_disconnect(socket_->id);
         // printf("closed !\n");
     }
+    pthread_join(socket_->close_pthread, NULL);
     resolve_wr_queue(socket_);
     
-    pthread_join(socket_->close_pthread, NULL);
     // printf("I AM HERE !\n");
     // pthread_barrier_wait(&socket_->close_barrier);
     // printf("i am here !\n");
