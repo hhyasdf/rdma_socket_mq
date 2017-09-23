@@ -238,14 +238,12 @@ Socket *connect_(Socket *socket_, char *address, char *port) {
 
 void close_(Socket *socket_) {                   // 释放socket结构体和其中的两个动态分配的队列
     
-    printf("line %d : close: %p\n", __LINE__, socket_->id);
+    // printf("line %d : close: %p\n", __LINE__, socket_->id);
     if(socket_->pd == NULL) {
-        printf("pd == NULL\n");
         return;
     }
 
     if(send_close_md(socket_)){
-        printf("rdma disconnect\n");
         rdma_disconnect(socket_->id);
         // printf("closed !\n");
     }

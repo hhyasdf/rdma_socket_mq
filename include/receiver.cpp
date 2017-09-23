@@ -58,7 +58,7 @@ static void *listen_process(void *re) {
         if(listen == NULL) {
             break;
         }
-        // printf("%s :%d\n", __FILE__, __LINE__);
+        printf("%s :%d\n", __FILE__, __LINE__);
         listen->receiver = (Receiver *)re;
         
         queue_push(((Receiver *)re)->socket_queue, static_cast<void *>(listen));
