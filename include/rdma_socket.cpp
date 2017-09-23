@@ -55,6 +55,13 @@ static int send_close_md(Socket *socket_) {
     struct ibv_mr *send_mr;
     MetaData metadata;
 
+    while(socket_->ack_counter < socket_->metadata_counter) {
+        if(poll_wc(socket_, &wc) < 0) {
+            return 0;
+        }
+        resolve_wr_queue(socket_);
+    }
+    
     memset(&metadata, 0, sizeof(metadata));
     metadata.type = METADATA_CLOSE;
 
@@ -63,13 +70,6 @@ static int send_close_md(Socket *socket_) {
     while(poll_wc(socket_, &wc) > 0);
 
     ibv_dereg_mr(send_mr);
-
-    while(socket_->ack_counter < socket_->metadata_counter) {
-        if(poll_wc(socket_, &wc) < 0) {
-            return 0;
-        }
-        resolve_wr_queue(socket_);
-    }
 
     if(wc.status != IBV_WC_SUCCESS) {
 
@@ -325,8 +325,6 @@ Message *recv_(Socket *socket_) {            // 用户提供指针地址，函�
     struct ibv_cq *cq;
     Message *recv_msg;
 
-    // printf("%s: line: %d\n", __FILE__, __LINE__);
-
     if(pthread_mutex_trylock(&socket_->close_lock)) {
         return NULL;
     }
@@ -346,22 +344,11 @@ Message *recv_(Socket *socket_) {            // 用户提供指针地址，函�
         socket_->close_flag = 1;
     }
 
-    // printf("recv_queue num : %d\n", num_of_queue(socket_->recv_queue));
-    // Node *head = socket_->recv_queue->head, *tail = socket_->recv_queue->tail;
-    // while(head != NULL) {
-    //     printf("node buffer: %s addr: %p\n", ((Message *)head->buffer)->buffer, ((Message *)head->buffer)->buffer);
-    //     head = head->next;
-    // }
-
-    if((recv_msg = (Message *)queue_pop(socket_->recv_queue)) != NULL) {
-        // printf("%s: line: %d\n", __FILE__, __LINE__);
-        // printf("%s %d: buffer: %s, length: %d, flag: %d\n", __FILE__, __LINE__, recv_msg->buffer, recv_msg->length, recv_msg->flag);        
+    if((recv_msg = (Message *)queue_pop(socket_->recv_queue)) != NULL) {      
         return recv_msg;
     } else if(pthread_mutex_trylock(&socket_->close_lock)) {    // 往下 *recv_buffer 都为 NULL
-        // printf("%s: line: %d\n", __FILE__, __LINE__);
         return NULL;
     } else if (socket_->close_flag == 1) {
-        // printf("%s: line: %d\n", __FILE__, __LINE__);
         return NULL;                                   
     } else {
         pthread_mutex_unlock(&socket_->close_lock);                          
@@ -370,20 +357,16 @@ Message *recv_(Socket *socket_) {            // 用户提供指针地址，函�
         // }
         while(flag == 1){
             if(poll_wc(socket_, NULL) == -1) {
-                // printf("%s: line: %d\n", __FILE__, __LINE__);
                 return NULL;
             }
             flag = resolve_wr_queue(socket_);
         }
     }
-    // printf("%s: line: %d\n", __FILE__, __LINE__);
 
     if(flag == -1) { 
         socket_->close_flag = 1;                  // 断开连接会将 close_flag 设成 1
     }
-    // printf("%s: line: %d\n", __FILE__, __LINE__);
     return (Message *)queue_pop(socket_->recv_queue);
-    // printf("%s %d: buffer: %s, length: %d, flag: %d\n", __FILE__, __LINE__, recv_msg->buffer, recv_msg->length, recv_msg->flag);
 }
 
 
