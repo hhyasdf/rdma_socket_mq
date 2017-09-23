@@ -30,7 +30,7 @@ static void *recv_process(void *listen) {
             break;
         }
 
-        printf("recv a msg: %s\n", msg->buffer);
+        // printf("recv a msg: %s\n", msg->buffer);
 
         if (msg->flag == SND_MORE_FLAG) {
             queue_push(l->more_queue, (void *)msg);

@@ -17,7 +17,7 @@ int main(int argc, char **argv) {
     int i;
     char msg[31];
     memcpy(msg,MSG,MSG_LEN);
-    for(; 1;){
+    for(int i = 0; i < 10; i ++){
         printf("Waiting for send command\n");
         scanf("%c",&ch);
         while(ch=='\n') scanf("%c",&ch);
