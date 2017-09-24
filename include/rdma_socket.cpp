@@ -417,13 +417,13 @@ Socket *recv_(Socket *socket_, Queue *de_queue) {
         }
     }
 
-    if(flag == -1) { 
-        socket_->close_flag = 1;                  // 断开连接会将 close_flag 设成 1
-        return NULL;
-    }
-
     queue_push_q(de_queue, socket_->recv_queue);
     queue_reset(socket_->recv_queue);
+    
+    if(flag == -1) { 
+        socket_->close_flag = 1;                  // 断开连接会将 close_flag 设成 1
+    }
+
     return socket_;
 }
 
