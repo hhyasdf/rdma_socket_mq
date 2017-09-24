@@ -99,12 +99,16 @@ int resolve_wr_queue_flag(Socket *socket_) {               // 处理 wr_queue �
             } else {
                 if(!queue_if_empty(socket_->more_queue)) {
                     queue_push_q(socket_->recv_queue, socket_->more_queue);
+                    socket_->more_queue->head = NULL;
+                    socket_->more_queue->tail = NULL;
                 }
                 queue_push(socket_->recv_queue, recv_msg);
             }
             flag = 0;
         } else if (stat == CLOSERESOLVED){
             queue_push_q(socket_->recv_queue, socket_->more_queue);
+            socket_->more_queue->head = NULL;
+            socket_->more_queue->tail = NULL;
             return -1;
         } else if (stat == ERRORWC) {
             return -1;

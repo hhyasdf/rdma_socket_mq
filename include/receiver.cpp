@@ -41,6 +41,8 @@ static void *recv_process(void *listen) {
         // } else {
         //     if(!queue_if_empty(more_queue)) {
         //         queue_push_q(l->recv_queue, more_queue);
+        //         more_queue->head = NULL;
+        //         more_queue->tail = NULL;
         //     }
         //     queue_push(l->receiver->recv_queue, (void *)msg);
 
