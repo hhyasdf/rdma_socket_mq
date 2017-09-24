@@ -96,13 +96,13 @@ int resolve_wr_queue_flag(Socket *socket_) {               // 处理 wr_queue �
         if((stat = recv_wc_handle(socket_, wc, &recv_msg)) == RDMAREADSOLVED) {
             if(recv_msg->flag == SND_MORE_FLAG){
                 queue_push(socket_->more_queue, recv_msg);
-                printf("add a node: %s\n", recv_msg->buffer);
             } else {
                 if(!queue_if_empty(socket_->more_queue)) {
                     queue_push_q(socket_->recv_queue, socket_->more_queue);
                     queue_reset(socket_->more_queue);
                 }
                 queue_push(socket_->recv_queue, recv_msg);
+                printf("add a node: %s\n", recv_msg->buffer);
             }
             flag = 0;
         } else if (stat == CLOSERESOLVED){
