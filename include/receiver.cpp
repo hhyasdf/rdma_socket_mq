@@ -42,6 +42,7 @@ static void *recv_process(void *listen) {
         // }
         listen = recv_(l, l->receiver->recv_queue);
         printf("Success recv!\n");
+        printf("num of recv_queue: %d", l->recv_queue->node_num);
 
         if(listen == NULL) {
             break;
@@ -63,7 +64,7 @@ static void *listen_process(void *re) {
         if(listen == NULL) {
             break;
         }
-        printf("%s :%d\n", __FILE__, __LINE__);
+        // printf("%s :%d\n", __FILE__, __LINE__);
         listen->receiver = (Receiver *)re;
         
         queue_push(((Receiver *)re)->socket_queue, static_cast<void *>(listen));

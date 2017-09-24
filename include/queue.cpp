@@ -87,6 +87,7 @@ void queue_push_q(Queue *de_queue, Queue *src_queue) {
         }
         de_queue->tail = src_queue->tail;
     }
+    de_queue->node_num += src_queue->node_num;
     
     pthread_mutex_unlock(&de_queue->queue_lock);
 }
