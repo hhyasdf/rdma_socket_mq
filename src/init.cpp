@@ -1,6 +1,6 @@
-#include "rdma_socket.h"
-#include "post_wr.h"
-#include "init.h"
+#include "../include/rdma_socket.h"
+#include "../include/post_wr.h"
+#include "../include/init.h"
 
 #include <stdlib.h>
 #include <stdio.h>

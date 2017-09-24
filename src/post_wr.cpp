@@ -1,5 +1,5 @@
-#include "rdma_socket.h"
-#include "post_wr.h"
+#include "../include/rdma_socket.h"
+#include "../include/post_wr.h"
 
 #include <stdlib.h>
 #include <rdma/rdma_verbs.h>

@@ -1,8 +1,8 @@
-#include "rdma_socket.h"
-#include "post_wr.h"
-#include "poll_wc.h"
-#include "init.h"
-#include "message.h"
+#include "../include/rdma_socket.h"
+#include "../include/post_wr.h"
+#include "../include/poll_wc.h"
+#include "../include/init.h"
+#include "../include/message.h"
 
 #include <unistd.h>
 #include <stdlib.h>

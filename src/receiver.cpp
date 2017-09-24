@@ -1,10 +1,12 @@
-#include "receiver.h"
+#include "../include/receiver.h"
+#include "../include/rdma_socket.h"
+#include "../include/queue.h"
+
 #include <stdio.h>
 #include <stdlib.h>
 #include <unistd.h>
 #include <pthread.h>
-#include "rdma_socket.h"
-#include "queue.h"
+
 
 
 

@@ -1,6 +1,6 @@
-#include "rdma_socket.h"
-#include "queue.h"
-#include "poll_wc.h"
+#include "../include/rdma_socket.h"
+#include "../include/queue.h"
+#include "../include/poll_wc.h"
 
 #include <stdlib.h>
 #include <stdio.h>
