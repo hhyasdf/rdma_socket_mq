@@ -16,7 +16,7 @@ int main(int argc, char** argv) {
     receiver_bind(re, DEFAULT_PORT);
     while(1) {
         msg = receiver_recv(re);
-        // printf("Get a message : %s\n", msg->buffer);
+        printf("Get a message : %s\n", msg->buffer);
         free(msg->buffer);
         free(msg);
         msg = NULL;
