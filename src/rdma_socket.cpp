@@ -34,9 +34,9 @@ Socket* socket_(enum rdma_port_space type) {
 }
 
 
-void bind_(Socket *socket_, void *addr, int protocol) {     // protocol can be AF_INET6 or AF_INET
+int bind_(Socket *socket_, void *addr, int protocol) {     // protocol can be AF_INET6 or AF_INET
                                                             // addr指定本地服务端的地址为 sockaddr_in6 或 sockaddr_in6 结构
-    TEST_NZ(rdma_bind_addr(socket_->id, (struct sockaddr *)addr));    
+    return rdma_bind_addr(socket_->id, (struct sockaddr *)addr);    
 }
 
 

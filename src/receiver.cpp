@@ -85,9 +85,10 @@ static void *listen_process(void *re) {
 }
 
 
-void receiver_bind(Receiver* re, int port) {
+int receiver_bind(Receiver* re, int port) {
     struct sockaddr_in addr;
     pthread_t p_id;
+    int flag = 0;
 
     memset(&addr, 0, sizeof(addr));
     addr.sin_port = htons(port);
@@ -96,12 +97,13 @@ void receiver_bind(Receiver* re, int port) {
     Socket *socket = NULL;
 
     socket = socket_(RDMA_PS_TCP);
-    bind_(socket, &addr, AF_INET);
+    flag = bind_(socket, &addr, AF_INET);
 
     listen_(socket, 100);
     re->listener = socket;
 
     pthread_create(&static_cast<Receiver *>(re)->p_id, NULL, listen_process, (void *)re);
+    return flag;
 }
 
 AMessage *receiver_recv(Receiver* re) {

@@ -90,7 +90,7 @@ Socket* socket_(enum rdma_port_space type);
 void listen_(Socket *socket_, int backlog);
 int connect_(Socket **socket_, char *address, char *port, int node_id);
 Socket *accept_(Socket *socket_, struct Receiver_ *receiver);
-void bind_(Socket *socket_, void *addr, int protocol);
+int bind_(Socket *socket_, void *addr, int protocol);
 void close_(Socket *socket_);
 AMessage *recv_(Socket *socket_);
 Socket *recv_(Socket *socket_, Queue *de_queue);
