@@ -41,6 +41,7 @@ static void *recv_process(void *listen) {
         //     pthread_cond_signal(&l->receiver->cond);
         // }
         listen = recv_(l, l->receiver->recv_queue);
+        printf("Success recv!\n");
 
         if(listen == NULL) {
             break;
