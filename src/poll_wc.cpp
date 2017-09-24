@@ -16,6 +16,9 @@
 
 void close_handle(Socket *socket_, struct ibv_wc *wc) {                          // 关闭时处理wc的函数
     Rinfo *rinfo  = (Rinfo *)wc->wr_id;
+    if(rinfo == NULL) {
+        return ;
+    }
     MetaData *recv_buffer = (MetaData *)rinfo->buffer;
 
     if(recv_buffer->type == METADATA_ACK) {
