@@ -41,7 +41,7 @@ static void *recv_process(void *listen) {
         // }
         listen = recv_(l, l->receiver->recv_queue);
         printf("Success recv!\n");
-        printf("num of recv_queue: %d", l->recv_queue->node_num);
+        printf("num of recv_queue: %d\n", l->recv_queue->node_num);
 
         
 
