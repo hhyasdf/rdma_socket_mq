@@ -1,5 +1,5 @@
-#include "message.h"
-#include "rdma_socket.h"
+#include "../include/message.h"
+#include "../include/rdma_socket.h"
 #include <stdlib.h>
 
 
