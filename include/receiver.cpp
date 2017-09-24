@@ -29,7 +29,9 @@ static void *recv_process(void *listen) {
             queue_push_q(l->recv_queue, more_queue);
             queue_push_q(l->receiver->recv_queue, l->recv_queue);
             queue_reset(l->recv_queue);
-            queue_reset(more_queue);            
+            queue_reset(more_queue);
+        
+            pthread_cond_signal(&l->receiver->cond);            
             break;
         }
 
@@ -98,13 +100,17 @@ void receiver_bind(Receiver* re, int port) {
 }
 
 Message *receiver_recv(Receiver* re) {
-    pthread_mutex_lock(&re->recv_queue->queue_lock);
-    if(queue_if_empty(re->recv_queue)) {
-        pthread_cond_wait(&re->cond, &re->recv_queue->queue_lock);
-    }
-    pthread_mutex_unlock(&re->recv_queue->queue_lock);
+    while(1){
+        Message *msg;
+        pthread_mutex_lock(&re->recv_queue->queue_lock);
+        if(queue_if_empty(re->recv_queue)) {
+            pthread_cond_wait(&re->cond, &re->recv_queue->queue_lock);
+        }
+        pthread_mutex_unlock(&re->recv_queue->queue_lock);
 
-    return static_cast<Message *>(queue_pop(re->recv_queue));
+        msg = static_cast<Message *>(queue_pop(re->recv_queue));
+        if(msg != NULL) return msg;
+    }
 }
 
 
