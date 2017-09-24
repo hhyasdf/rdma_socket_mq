@@ -46,6 +46,7 @@ static void *recv_process(void *listen) {
 
         //     pthread_cond_signal(&l->receiver->cond);
         // }
+        pthread_cond_signal(&l->receiver->cond);
     }
 }
 

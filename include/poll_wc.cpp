@@ -97,7 +97,9 @@ int resolve_wr_queue_flag(Socket *socket_) {               // 处理 wr_queue �
             if(recv_msg->flag == SND_MORE_FLAG){
                 queue_push(socket_->more_queue, recv_msg);
             } else {
-                queue_push_q(socket_->recv_queue, socket_->more_queue);
+                if(!queue_if_empty(socket_->more_queue)) {
+                    queue_push_q(socket_->recv_queue, socket_->more_queue);
+                }
                 queue_push(socket_->recv_queue, recv_msg);
             }
             flag = 0;
