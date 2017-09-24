@@ -11,6 +11,7 @@
 #define RDMAREADSOLVED 8
 #define ACKSOLVED 9
 #define ERRORWC 10
+#define CLOSERESOLVED 11
 
 
 void close_handle(Socket *socket_, struct ibv_wc *wc) {                          // 关闭时处理wc的函数
@@ -77,6 +78,32 @@ int resolve_wr_queue(Socket *socket_) {               // 处理 wr_queue 中的 
         if((stat = recv_wc_handle(socket_, wc, &recv_msg)) == RDMAREADSOLVED) {
             queue_push(socket_->recv_queue, recv_msg);
             flag = 0;
+        } else if (stat == ERRORWC) {
+            return -1;
+        }
+        free(wc);
+    }
+    return flag;
+}
+
+
+int resolve_wr_queue_flag(Socket *socket_) {               // 处理 wr_queue 中的 wc
+    struct ibv_wc *wc;
+    int flag = 1, stat;
+    Message *recv_msg = NULL;
+
+    while((wc = (struct ibv_wc *)queue_pop(socket_->wr_queue)) != NULL) {
+        if((stat = recv_wc_handle(socket_, wc, &recv_msg)) == RDMAREADSOLVED) {
+            if(recv_msg->flag == SND_MORE_FLAG){
+                queue_push(socket_->more_queue, recv_msg);
+            } else {
+                queue_push_q(socket_->recv_queue, socket_->more_queue);
+                queue_push(socket_->recv_queue, recv_msg);
+            }
+            flag = 0;
+        } else if (stat == CLOSERESOLVED){
+            queue_push_q(socket_->recv_queue, socket_->more_queue);
+            return -1;
         } else if (stat == ERRORWC) {
             return -1;
         }

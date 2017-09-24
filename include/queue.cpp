@@ -76,19 +76,19 @@ bool queue_if_empty(Queue *queue) {
     return (queue->tail == NULL);
 }
 
-void queue_push_q(Queue *queue, Queue *q) {
-    pthread_mutex_lock(&queue->queue_lock);
+void queue_push_q(Queue *de_queue, Queue *src_queue) {
+    pthread_mutex_lock(&de_queue->queue_lock);
 
-    if(q->tail != NULL) {
-        if(queue->tail != NULL) {
-            queue->tail->next = q->head;
+    if(src_queue->tail != NULL) {
+        if(de_queue->tail != NULL) {
+            de_queue->tail->next = src_queue->head;
         } else {
-            queue->head = q->head;
+            de_queue->head = src_queue->head;
         }
-        queue->tail = q->tail;
+        de_queue->tail = src_queue->tail;
     }
     
-    pthread_mutex_unlock(&queue->queue_lock);
+    pthread_mutex_unlock(&de_queue->queue_lock);
 }
 
 int num_of_queue(Queue *queue) {

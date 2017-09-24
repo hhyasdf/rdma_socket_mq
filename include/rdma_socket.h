@@ -91,6 +91,7 @@ Socket *accept_(Socket *socket_, struct Receiver_ *receiver);
 void bind_(Socket *socket_, void *addr, int protocol);
 void close_(Socket *socket_);
 Message *recv_(Socket *socket_);
+Socket *recv_(Socket *socket_, Queue *de_queue);
 int send_(Socket *socket_, Message *msg);
 
 

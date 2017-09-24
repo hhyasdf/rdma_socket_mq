@@ -61,7 +61,8 @@ static int send_close_md(Socket *socket_) {
         if(poll_wc(socket_, &wc) < 0) {
             return 0;
         }
-        resolve_wr_queue(socket_);
+        // resolve_wr_queue(socket_);
+        resolve_wr_queue_flag(socket_);
     }
 
     memset(&metadata, 0, sizeof(metadata));
@@ -237,7 +238,8 @@ void close_(Socket *socket_) {                   // 释放socket结构体和其�
         rdma_disconnect(socket_->id);
     }
     pthread_join(socket_->close_pthread, NULL);
-    resolve_wr_queue(socket_);
+    // resolve_wr_queue(socket_);
+    resolve_wr_queue_flag(socket_);
     
 
     queue_destroy(socket_->recv_queue);
@@ -308,7 +310,11 @@ int send_(Socket *socket_, Message *msg) {      // 当一次性send操作数超�
     socket_->metadata_counter ++;
     pthread_mutex_unlock(&socket_->metadata_counter_lock);
     
-    if(resolve_wr_queue(socket_) == -1) {
+    // if(resolve_wr_queue(socket_) == -1) {
+    //     socket_->close_flag = 1;
+    // }
+
+    if(resolve_wr_queue_flag(socket_) == -1) {
         socket_->close_flag = 1;
     }
 
@@ -365,6 +371,65 @@ Message *recv_(Socket *socket_) {            // 用户提供指针地址，函�
         socket_->close_flag = 1;                  // 断开连接会将 close_flag 设成 1
     }
     return (Message *)queue_pop(socket_->recv_queue);
+}
+
+
+Socket *recv_(Socket *socket_, Queue *de_queue) {
+    int flag = 1;
+    struct ibv_wc wc;
+    void *wc_save;
+    struct ibv_cq *cq;
+    Message *recv_msg;
+
+    if(pthread_mutex_trylock(&socket_->close_lock)) {
+        return NULL;
+    }
+    pthread_mutex_unlock(&socket_->close_lock);
+
+    while(ibv_poll_cq(socket_->cq, 1, &wc) == 1){
+        if(wc.opcode == IBV_WC_SEND || wc.opcode == IBV_WC_RDMA_READ){
+            continue;
+        } else {
+            wc_save = malloc(sizeof(struct ibv_wc));
+            memcpy(wc_save, &wc, sizeof(wc));
+            queue_push(socket_->wr_queue, wc_save);
+        }
+    }
+    flag = resolve_wr_queue_flag(socket_);
+    if (flag == -1) {
+        socket_->close_flag = 1;
+    }
+
+    if(!queue_if_empty(socket_->recv_queue)) {
+        queue_push_q(de_queue, socket_->recv_queue);
+        socket_->recv_queue->head = NULL;
+        socket_->recv_queue->tail = NULL;      
+        return socket_;
+    } else if(pthread_mutex_trylock(&socket_->close_lock)) {    // 往下 *recv_buffer 都为 NULL
+        return NULL;
+    } else if (socket_->close_flag == 1) {
+        return NULL;                                   
+    } else {
+        pthread_mutex_unlock(&socket_->close_lock);                          
+        // if(socket_->close_flag == 1){
+        //     return ;
+        // }
+        while(flag == 1){
+            if(poll_wc(socket_, NULL) == -1) {
+                return NULL;
+            }
+            flag = resolve_wr_queue_flag(socket_);
+        }
+    }
+
+    if(flag == -1) { 
+        socket_->close_flag = 1;                  // 断开连接会将 close_flag 设成 1
+    }
+
+    queue_push_q(de_queue, socket_->recv_queue);
+    socket_->recv_queue->head = NULL;
+    socket_->recv_queue->tail = NULL;
+    return socket_;
 }
 
 
