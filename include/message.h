@@ -9,6 +9,7 @@ typedef struct Message_{
     int flag;
     int length;
     bool if_free_buffer;
+    int node_id;
 }Message;
 
 

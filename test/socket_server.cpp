@@ -46,6 +46,7 @@ int main(int argc, char** argv) {
             break;
         }
         printf("%s\n", buffer->buffer);
+        printf("node_id: %d\n", buffer->node_id);
         Message_destroy(buffer);
     }
 

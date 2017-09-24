@@ -164,13 +164,17 @@ Socket *accept_(Socket *socket_, struct Receiver_ *receiver) {
 
         if(event_copy.event == RDMA_CM_EVENT_CONNECT_REQUEST) {
             
-            new_socket_ = buildConnection(event_copy.id);
+            new_socket_ = buildConnection(event_copy.id, 0);
             new_socket_->receiver = receiver;
             ec = new_socket_->ec;
 
             build_params(&cm_params);
             rdma_accept(new_socket_->id, &cm_params);
         } else if (event_copy.event == RDMA_CM_EVENT_ESTABLISHED) {
+
+            Message *id_msg = recv_(new_socket_);
+            new_socket_->node_id = *((int *)(id_msg->buffer));
+
             pthread_create(&new_socket_->close_pthread, NULL, wait_for_close, new_socket_);
             return new_socket_;
         } else if (event_copy.event == RDMA_CM_EVENT_DISCONNECTED) {
@@ -180,7 +184,7 @@ Socket *accept_(Socket *socket_, struct Receiver_ *receiver) {
 }
 
 
-int connect_(Socket **socket_, char *address, char *port) {         
+int connect_(Socket **socket_, char *address, char *port, int node_id) {         
     
     struct addrinfo *addr;
     TEST_NZ(getaddrinfo(address, port, NULL, &addr));
@@ -200,7 +204,7 @@ int connect_(Socket **socket_, char *address, char *port) {
             printf("RDMA_CM_EVENT_ADDR_ERROR");
             exit(0);
         } else if (event.event == RDMA_CM_EVENT_ADDR_RESOLVED) {
-            new_socket_ = buildConnection(event.id);
+            new_socket_ = buildConnection(event.id, node_id);
             ec = new_socket_->ec;
             free(*socket_);
             *socket_ = new_socket_;            
@@ -210,6 +214,9 @@ int connect_(Socket **socket_, char *address, char *port) {
             rdma_connect(event.id, &con_params);
         } else if (event.event == RDMA_CM_EVENT_ESTABLISHED) {
             
+            Message *id_msg = Message_create(&node_id, sizeof(int), 0);
+            send_(new_socket_, id_msg);
+
             pthread_create(&(new_socket_->close_pthread), NULL, wait_for_close, new_socket_);
 
             return 1;

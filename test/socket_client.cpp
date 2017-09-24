@@ -13,7 +13,7 @@ int main(int argc, char **argv) {
     
     socket = socket_(RDMA_PS_TCP);
 
-    connect_(&socket, argv[1], argv[2]);
+    connect_(&socket, argv[1], argv[2], 198);
     int i;
     char msg[31];
     memcpy(msg,MSG,MSG_LEN);
@@ -26,6 +26,7 @@ int main(int argc, char **argv) {
         msg = Message_create((void *)MSG, sizeof(MSG), 0);
         if(send_(socket, msg))break;
         printf("%s\n", msg->buffer);
+        printf("node_id, %d\n", msg->node_id);
         Message_destroy(msg);
     }
     

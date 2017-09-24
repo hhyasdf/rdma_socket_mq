@@ -18,13 +18,14 @@ void build_params(struct rdma_conn_param *params)                // remote read 
 }
 
 
-Socket *buildConnection(struct rdma_cm_id *id) {  // 用收到的id中的verbs作为
+Socket *buildConnection(struct rdma_cm_id *id, int node_id) {  // 用收到的id中的verbs作为
 
     Socket *new_socket_ = (Socket *)malloc(sizeof(Socket));
     memset(new_socket_, 0, sizeof(Socket));
 
     //new_socket_->id = NULL;
     new_socket_->id = id;
+    new_socket_->node_id = node_id;
     new_socket_->ec = rdma_create_event_channel();
     TEST_NZ(rdma_migrate_id(new_socket_->id, new_socket_->ec));
 

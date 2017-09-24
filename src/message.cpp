@@ -10,6 +10,7 @@ Message *Message_create(void *buffer, int length, int flag, bool if_free_buffer)
     msg->flag = flag;
     msg->length = length;
     msg->if_free_buffer = if_free_buffer;
+    msg->node_id = 0;
 
     return msg;
 }
