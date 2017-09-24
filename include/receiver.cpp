@@ -25,17 +25,9 @@ static void *recv_process(void *listen) {
     Message *msg; 
     while(1) {
         msg = recv_(l);
-        // listen = recv_(l, l->receiver->recv_queue);
-
-        // if(listen == NULL) {
-        //     break;
-        // }
         if(msg == NULL){
             break;
         }
-
-        // printf("recv a msg: %s\n", msg->buffer);
-
         if (msg->flag == SND_MORE_FLAG) {
             queue_push(l->more_queue, (void *)msg);
         } else {
@@ -48,6 +40,11 @@ static void *recv_process(void *listen) {
 
             pthread_cond_signal(&l->receiver->cond);
         }
+        // listen = recv_(l, l->receiver->recv_queue);
+
+        // if(listen == NULL) {
+        //     break;
+        // }
         // pthread_cond_signal(&l->receiver->cond);
     }
 }
