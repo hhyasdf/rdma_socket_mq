@@ -27,11 +27,11 @@ static void *recv_process(void *listen) {
         msg = recv_(l);
         if(msg == NULL){
             queue_push_q(l->recv_queue, more_queue);
+            queue_push_q(l->receiver->recv_queue, l->recv_queue);
+            queue_reset(l->recv_queue);
             queue_reset(more_queue);            
             break;
         }
-
-        printf("Get a message: %s\n", msg->buffer);
 
         if (msg->flag == SND_MORE_FLAG) {
             queue_push(l->more_queue, (void *)msg);
