@@ -38,5 +38,5 @@ int main(int argc, char **argv) {
     for(int i = 0; i < THREAD_NUM; i ++){
         pthread_join(p_id[i], NULL);
     }
-    close_(socket);
+    // close_(socket);
 }
