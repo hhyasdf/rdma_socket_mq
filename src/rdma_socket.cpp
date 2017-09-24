@@ -226,6 +226,7 @@ int connect_(Socket **socket_, char *address, char *port) {
 void close_(Socket *socket_) {                   // 释放socket结构体和其中的两个动态分配的队列
     
     if(socket_->pd == NULL) {
+        rdma_disconnect(socket_->id);
         return;
     }
 
