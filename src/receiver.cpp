@@ -122,13 +122,12 @@ Message *receiver_recv(Receiver* re) {
 void receiver_close(Receiver *re) {
     Socket *socket = NULL;
     close_(re->listener);
-    pthread_cancel(re->p_id);
     while((socket = static_cast<Socket *>(queue_pop(re->socket_queue))) != NULL) {
         close_(socket);
     }
     queue_destroy(re->socket_queue);
     queue_destroy(re->recv_queue);
 
-    pthread_join(re->p_id, NULL);
+    pthread_cancel(re->p_id);
 }
 
