@@ -61,8 +61,8 @@ static int send_close_md(Socket *socket_) {
         if(poll_wc(socket_, &wc) < 0) {
             return 0;
         }
-        // resolve_wr_queue(socket_);
-        resolve_wr_queue_flag(socket_);
+        resolve_wr_queue(socket_);
+        // resolve_wr_queue_flag(socket_);
     }
 
     memset(&metadata, 0, sizeof(metadata));
@@ -238,8 +238,8 @@ void close_(Socket *socket_) {                   // 释放socket结构体和其�
         rdma_disconnect(socket_->id);
     }
     pthread_join(socket_->close_pthread, NULL);
-    // resolve_wr_queue(socket_);
-    resolve_wr_queue_flag(socket_);
+    resolve_wr_queue(socket_);
+    // resolve_wr_queue_flag(socket_);
     
 
     queue_destroy(socket_->recv_queue);
@@ -310,13 +310,13 @@ int send_(Socket *socket_, Message *msg) {      // 当一次性send操作数超�
     socket_->metadata_counter ++;
     pthread_mutex_unlock(&socket_->metadata_counter_lock);
     
-    // if(resolve_wr_queue(socket_) == -1) {
-    //     socket_->close_flag = 1;
-    // }
-
-    if(resolve_wr_queue_flag(socket_) == -1) {
+    if(resolve_wr_queue(socket_) == -1) {
         socket_->close_flag = 1;
     }
+
+    // if(resolve_wr_queue_flag(socket_) == -1) {
+    //     socket_->close_flag = 1;
+    // }
 
     return 0;
 }
