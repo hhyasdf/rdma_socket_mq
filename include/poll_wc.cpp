@@ -163,8 +163,6 @@ int recv_wc_handle(Socket *socket_, struct ibv_wc *wc, Message **recv_msg) {    
 
         ibv_dereg_mr((struct ibv_mr *)md_buffer->mr_addr);
 
-        // printf("line: %d ,dereg: %p\n", __LINE__, md_buffer->mr_addr);
-
         free((void *)md_buffer->msg_addr);
         md_buffer->msg_addr = NULL;
 
@@ -187,8 +185,6 @@ int recv_wc_handle(Socket *socket_, struct ibv_wc *wc, Message **recv_msg) {    
         md_buffer, 
         sizeof(MetaData), 
         (struct ibv_mr *)rinfo->mr));
-
-        printf("get close metadata !\n");
 
         return ERRORWC;
     }

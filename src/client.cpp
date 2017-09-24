@@ -24,7 +24,7 @@ void *send_process(void *socket){
 
 
 int main(int argc, char **argv) {
-    //int msg_len, 
+
     Socket *socket;
     pthread_t p_id[THREAD_NUM];
 
@@ -38,5 +38,4 @@ int main(int argc, char **argv) {
     for(int i = 0; i < THREAD_NUM; i ++){
         pthread_join(p_id[i], NULL);
     }
-    // close_(socket);
 }

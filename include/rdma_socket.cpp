@@ -112,11 +112,8 @@ static void *wait_for_close(void *socket_) {
 
         if (event_copy.event == RDMA_CM_EVENT_DISCONNECTED) {
 
-            // printf("lock close_lock 1\n");
-
             pthread_mutex_lock(&sock->close_lock);
 
-            // printf("line %d : close: %p\n", __LINE__, sock->id);
             rdma_disconnect(sock->id);
             
             struct ibv_wc wc, *wc_save;
@@ -133,8 +130,6 @@ static void *wait_for_close(void *socket_) {
                 close_handle(sock, wc_save);
             }
 
-            // printf("%d\n", sock->id);
-
             rdma_destroy_qp(sock->id);
             ibv_destroy_cq(sock->cq);
             ibv_destroy_comp_channel(sock->cc);
@@ -146,10 +141,6 @@ static void *wait_for_close(void *socket_) {
         
             ibv_dealloc_pd(sock->pd);
         
-            
-            // printf("I AM HERE !\n");
-            // pthread_barrier_wait(&sock->close_barrier);
-            // printf("i am here !\n");
             return 0;
         }
     }
@@ -166,8 +157,6 @@ Socket *accept_(Socket *socket_, struct Receiver_ *receiver) {
     
     printf("%s line: %d \n", __FILE__, __LINE__);
     while (rdma_get_cm_event(ec, &event) == 0) {
-        
-        // printf("%d\n", ec);
         
         memcpy(&event_copy, event, sizeof(*event));
 
@@ -215,18 +204,15 @@ int connect_(Socket **socket_, char *address, char *port) {
             printf("RDMA_CM_EVENT_ADDR_ERROR");
             exit(0);
         } else if (event.event == RDMA_CM_EVENT_ADDR_RESOLVED) {
-        // printf("1\n");
             new_socket_ = buildConnection(event.id);
             ec = new_socket_->ec;
             free(*socket_);
             *socket_ = new_socket_;            
             rdma_resolve_route(event.id, TIMEOUT_IN_MS);
         } else if (event.event == RDMA_CM_EVENT_ROUTE_RESOLVED) {
-        // printf("2\n");
             build_params(&con_params);
             rdma_connect(event.id, &con_params);
         } else if (event.event == RDMA_CM_EVENT_ESTABLISHED) {
-		// printf("3\n");
             
             pthread_create(&(new_socket_->close_pthread), NULL, wait_for_close, new_socket_);
 
@@ -243,21 +229,16 @@ int connect_(Socket **socket_, char *address, char *port) {
 
 void close_(Socket *socket_) {                   // 释放socket结构体和其中的两个动态分配的队列
     
-    // printf("line %d : close: %p\n", __LINE__, socket_->id);
     if(socket_->pd == NULL) {
         return;
     }
 
     if(send_close_md(socket_)){
         rdma_disconnect(socket_->id);
-        // printf("closed !\n");
     }
     pthread_join(socket_->close_pthread, NULL);
     resolve_wr_queue(socket_);
     
-    // printf("I AM HERE !\n");
-    // pthread_barrier_wait(&socket_->close_barrier);
-    // printf("i am here !\n");
 
     queue_destroy(socket_->recv_queue);
     queue_destroy(socket_->wr_queue);
