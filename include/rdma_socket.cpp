@@ -397,7 +397,8 @@ Socket *recv_(Socket *socket_, Queue *de_queue) {
 
     if(!queue_if_empty(socket_->recv_queue)) {
         queue_push_q(de_queue, socket_->recv_queue);
-        queue_reset(socket_->recv_queue);     
+        queue_reset(socket_->recv_queue);
+        printf("num of de_queue: %d\n", de_queue->node_num);     
         return socket_;
     } else if(pthread_mutex_trylock(&socket_->close_lock)) {    // 往下 *recv_buffer 都为 NULL
         return NULL;
