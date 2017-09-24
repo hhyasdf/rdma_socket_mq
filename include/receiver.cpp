@@ -24,30 +24,30 @@ static void *recv_process(void *listen) {
     Queue *more_queue = l->more_queue;
     Message *msg; 
     while(1) {
-        // msg = recv_(l);
-        // if(msg == NULL){
-        //     break;
-        // }
-        // if (msg->flag == SND_MORE_FLAG) {
-        //     queue_push(l->more_queue, (void *)msg);
-        // } else {
-        //     if(!queue_if_empty(more_queue)) {
-        //         queue_push_q(l->recv_queue, more_queue);
-        //         queue_reset(more_queue);
-        //     }
-        //     queue_push(l->receiver->recv_queue, (void *)msg);
-
-        //     pthread_cond_signal(&l->receiver->cond);
-        // }
-        listen = recv_(l, l->receiver->recv_queue);
-        printf("Success recv!\n");
-        printf("num of recv_queue %p: %d\n", l->receiver->recv_queue, l->receiver->recv_queue->node_num);
-        printf("listen: %p\n", listen);
-
-        if(listen == NULL) {
+        msg = recv_(l);
+        if(msg == NULL){
             break;
         }
-        pthread_cond_signal(&l->receiver->cond);
+        if (msg->flag == SND_MORE_FLAG) {
+            queue_push(l->more_queue, (void *)msg);
+        } else {
+            if(!queue_if_empty(more_queue)) {
+                queue_push_q(l->recv_queue, more_queue);
+                queue_reset(more_queue);
+            }
+            queue_push(l->receiver->recv_queue, (void *)msg);
+
+            pthread_cond_signal(&l->receiver->cond);
+        }
+        // listen = recv_(l, l->receiver->recv_queue);
+        // printf("Success recv!\n");
+        // printf("num of recv_queue %p: %d\n", l->receiver->recv_queue, l->receiver->recv_queue->node_num);
+        // printf("listen: %p\n", listen);
+
+        // if(listen == NULL) {
+        //     break;
+        // }
+        // pthread_cond_signal(&l->receiver->cond);
     }
 }
 
