@@ -4,18 +4,18 @@
 
 #define SND_MORE_FLAG 128
 
-typedef struct Message_{
+typedef struct AMessage_{
     void *buffer;
     int flag;
     int length;
     bool if_free_buffer;
     int node_id;
-}Message;
+}AMessage;
 
 
-Message *Message_create(void *buffer, int length, int flag, bool if_free_buffer = false);
-bool Message_check_sndmore(Message *msg);
-void Message_destroy(Message *msg);
+AMessage *AMessage_create(void *buffer, int length, int flag, bool if_free_buffer = false);
+bool AMessage_check_sndmore(AMessage *msg);
+void AMessage_destroy(AMessage *msg);
 
 
 #endif

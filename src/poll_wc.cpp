@@ -75,7 +75,7 @@ int poll_wc(Socket *socket_, struct ibv_wc *send_wc) {       // 获取一个提�
 int resolve_wr_queue(Socket *socket_) {               // 处理 wr_queue 中的 wc
     struct ibv_wc *wc;
     int flag = 1, stat;
-    Message *recv_msg = NULL;
+    AMessage *recv_msg = NULL;
 
     while((wc = (struct ibv_wc *)queue_pop(socket_->wr_queue)) != NULL) {
         if((stat = recv_wc_handle(socket_, wc, &recv_msg)) == RDMAREADSOLVED) {
@@ -94,7 +94,7 @@ int resolve_wr_queue(Socket *socket_) {               // 处理 wr_queue 中的 
 // int resolve_wr_queue_flag(Socket *socket_) {               // 处理 wr_queue 中的 wc
 //     struct ibv_wc *wc;
 //     int flag = 1, stat;
-//     Message *recv_msg = NULL;
+//     AMessage *recv_msg = NULL;
 
 //     while((wc = (struct ibv_wc *)queue_pop(socket_->wr_queue)) != NULL) {
 //         if((stat = recv_wc_handle(socket_, wc, &recv_msg)) == RDMAREADSOLVED) {
@@ -125,7 +125,7 @@ int resolve_wr_queue(Socket *socket_) {               // 处理 wr_queue 中的 
 
 
 
-int recv_wc_handle(Socket *socket_, struct ibv_wc *wc, Message **recv_msg) {         // 处理每一个recv的wc
+int recv_wc_handle(Socket *socket_, struct ibv_wc *wc, AMessage **recv_msg) {         // 处理每一个recv的wc
     if(wc->status != IBV_WC_SUCCESS) {
         // printf("err recv code: %d\n", wc->status);
         // die("quit");
@@ -141,7 +141,7 @@ int recv_wc_handle(Socket *socket_, struct ibv_wc *wc, Message **recv_msg) {    
     if(md_buffer->type == METADATA_NORMAL) {
         struct ibv_mr *read_mr;
 
-        *recv_msg = Message_create(malloc(md_buffer->length), md_buffer->length, md_buffer->flag, true);
+        *recv_msg = AMessage_create(malloc(md_buffer->length), md_buffer->length, md_buffer->flag, true);
         (*recv_msg)->node_id = socket_->node_id;
             
         TEST_Z(read_mr = ibv_reg_mr(

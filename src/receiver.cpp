@@ -24,7 +24,7 @@ Receiver *receiver_build() {
 static void *recv_process(void *listen) {
     Socket *l = (Socket *)listen;
     Queue *more_queue = l->more_queue;
-    Message *msg; 
+    AMessage *msg; 
     while(1) {
         msg = recv_(l);
         if(msg == NULL){
@@ -104,16 +104,16 @@ void receiver_bind(Receiver* re, int port) {
     pthread_create(&static_cast<Receiver *>(re)->p_id, NULL, listen_process, (void *)re);
 }
 
-Message *receiver_recv(Receiver* re) {
+AMessage *receiver_recv(Receiver* re) {
     while(1){
-        Message *msg;
+        AMessage *msg;
         pthread_mutex_lock(&re->recv_queue->queue_lock);
         if(queue_if_empty(re->recv_queue)) {
             pthread_cond_wait(&re->cond, &re->recv_queue->queue_lock);
         }
         pthread_mutex_unlock(&re->recv_queue->queue_lock);
 
-        msg = static_cast<Message *>(queue_pop(re->recv_queue));
+        msg = static_cast<AMessage *>(queue_pop(re->recv_queue));
         if(msg != NULL) return msg;
     }
 }

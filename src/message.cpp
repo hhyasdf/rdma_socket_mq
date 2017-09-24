@@ -1,11 +1,11 @@
-#include "../include/message.h"
+#include "../include/AMessage.h"
 #include "../include/rdma_socket.h"
 #include <stdlib.h>
 
 
 
-Message *Message_create(void *buffer, int length, int flag, bool if_free_buffer) {          // buffer要自己分配
-    Message *msg = (Message *)malloc(sizeof(Message));
+AMessage *AMessage_create(void *buffer, int length, int flag, bool if_free_buffer) {          // buffer要自己分配
+    AMessage *msg = (AMessage *)malloc(sizeof(AMessage));
     msg->buffer = buffer;
     msg->flag = flag;
     msg->length = length;
@@ -15,11 +15,11 @@ Message *Message_create(void *buffer, int length, int flag, bool if_free_buffer)
     return msg;
 }
 
-bool Message_check_sndmore(Message *msg) {
+bool AMessage_check_sndmore(AMessage *msg) {
     return (msg->flag == SND_MORE_FLAG);
 }
 
-void Message_destroy(Message *msg) {
+void AMessage_destroy(AMessage *msg) {
     if(msg->if_free_buffer) {
         free(msg->buffer);
     }

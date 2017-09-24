@@ -3,7 +3,7 @@
 #include "queue.h"
 #include <netdb.h>
 #include <pthread.h>
-#include "message.h"
+#include "AMessage.h"
 #include "receiver.h"
 
 
@@ -92,9 +92,9 @@ int connect_(Socket **socket_, char *address, char *port, int node_id);
 Socket *accept_(Socket *socket_, struct Receiver_ *receiver);
 void bind_(Socket *socket_, void *addr, int protocol);
 void close_(Socket *socket_);
-Message *recv_(Socket *socket_);
+AMessage *recv_(Socket *socket_);
 Socket *recv_(Socket *socket_, Queue *de_queue);
-int send_(Socket *socket_, Message *msg);
+int send_(Socket *socket_, AMessage *msg);
 
 
 

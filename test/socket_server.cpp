@@ -5,7 +5,7 @@
 
 
 #define MSG_LEN 32
-#define MSG "A message from server!@#$%^&*()"
+#define MSG "A AMessage from server!@#$%^&*()"
 #define MSG_COUNT 10
 
 #define DEFAULT_PORT 40000
@@ -35,7 +35,7 @@ int main(int argc, char** argv) {
     listen_(socket, 10);
 
     listen = accept_(socket, NULL);
-    Message *buffer = (Message *)1;
+    AMessage *buffer = (AMessage *)1;
         
         // sleep(5);          // 测试缓冲计数 达到缓冲最大值时send会阻塞 默认是10
         // printf("ready\n");
@@ -47,7 +47,7 @@ int main(int argc, char** argv) {
         }
         printf("%s\n", buffer->buffer);
         printf("node_id: %d\n", buffer->node_id);
-        Message_destroy(buffer);
+        AMessage_destroy(buffer); 
     }
 
     close_(listen);

@@ -2,7 +2,7 @@
 #include "../include/post_wr.h"
 #include "../include/poll_wc.h"
 #include "../include/init.h"
-#include "../include/message.h"
+#include "../include/AMessage.h"
 
 #include <unistd.h>
 #include <stdlib.h>
@@ -172,7 +172,7 @@ Socket *accept_(Socket *socket_, struct Receiver_ *receiver) {
             rdma_accept(new_socket_->id, &cm_params);
         } else if (event_copy.event == RDMA_CM_EVENT_ESTABLISHED) {
 
-            Message *id_msg = recv_(new_socket_);
+            AMessage *id_msg = recv_(new_socket_);
             new_socket_->node_id = *((int *)(id_msg->buffer));
 
             pthread_create(&new_socket_->close_pthread, NULL, wait_for_close, new_socket_);
@@ -214,7 +214,7 @@ int connect_(Socket **socket_, char *address, char *port, int node_id) {
             rdma_connect(event.id, &con_params);
         } else if (event.event == RDMA_CM_EVENT_ESTABLISHED) {
             
-            Message *id_msg = Message_create(&node_id, sizeof(int), 0);
+            AMessage *id_msg = AMessage_create(&node_id, sizeof(int), 0);
             send_(new_socket_, id_msg);
 
             pthread_create(&(new_socket_->close_pthread), NULL, wait_for_close, new_socket_);
@@ -257,7 +257,7 @@ void close_(Socket *socket_) {                   // 释放socket结构体和其�
 }
 
 
-int send_(Socket *socket_, Message *msg) {      // 当一次性send操作数超过初始的缓冲区大小会被阻塞
+int send_(Socket *socket_, AMessage *msg) {      // 当一次性send操作数超过初始的缓冲区大小会被阻塞
 
     struct ibv_send_wr *bad_wr = NULL;
     struct ibv_mr *send_mr, *msg_mr;
@@ -325,12 +325,12 @@ int send_(Socket *socket_, Message *msg) {      // 当一次性send操作数超�
 }
 
 
-Message *recv_(Socket *socket_) {            // 用户提供指针地址，函数来填充 *recv_buffer,用户需要自己free 
+AMessage *recv_(Socket *socket_) {            // 用户提供指针地址，函数来填充 *recv_buffer,用户需要自己free 
     int flag = 1;
     struct ibv_wc wc;
     void *wc_save;
     struct ibv_cq *cq;
-    Message *recv_msg;
+    AMessage *recv_msg;
 
     if(pthread_mutex_trylock(&socket_->close_lock)) {
         return NULL;
@@ -351,7 +351,7 @@ Message *recv_(Socket *socket_) {            // 用户提供指针地址，函�
         socket_->close_flag = 1;
     }
 
-    if((recv_msg = (Message *)queue_pop(socket_->recv_queue)) != NULL) {      
+    if((recv_msg = (AMessage *)queue_pop(socket_->recv_queue)) != NULL) {      
         return recv_msg;
     } else if(pthread_mutex_trylock(&socket_->close_lock)) {    // 往下 *recv_buffer 都为 NULL
         return NULL;
@@ -373,7 +373,7 @@ Message *recv_(Socket *socket_) {            // 用户提供指针地址，函�
     if(flag == -1) { 
         socket_->close_flag = 1;                  // 断开连接会将 close_flag 设成 1
     }
-    return (Message *)queue_pop(socket_->recv_queue);
+    return (AMessage *)queue_pop(socket_->recv_queue);
 }
 
 // 想改成一次性将socket的recv_queue 都放进去的操作
@@ -383,7 +383,7 @@ Message *recv_(Socket *socket_) {            // 用户提供指针地址，函�
 //     struct ibv_wc wc;
 //     void *wc_save;
 //     struct ibv_cq *cq;
-//     Message *recv_msg;
+//     AMessage *recv_msg;
 
 //     if(pthread_mutex_trylock(&socket_->close_lock)) {
 //         return NULL;

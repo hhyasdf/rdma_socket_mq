@@ -3,7 +3,7 @@
 #include <stdlib.h>
 
 #define MSG_LEN 32
-#define MSG "A message from client!@#$%^&*()"
+#define MSG "A AMessage from client!@#$%^&*()"
 #define MSG_COUNT 50
 
 int main(int argc, char **argv) {
@@ -22,12 +22,12 @@ int main(int argc, char **argv) {
         scanf("%c",&ch);
         while(ch=='\n') scanf("%c",&ch);
         // send msg
-        Message *msg;
-        msg = Message_create((void *)MSG, sizeof(MSG), 0);
+        AMessage *msg;
+        msg = AMessage_create((void *)MSG, sizeof(MSG), 0);
         if(send_(socket, msg))break;
         printf("%s\n", msg->buffer);
         printf("node_id, %d\n", msg->node_id);
-        Message_destroy(msg);
+        AMessage_destroy(msg);
     }
     
     close_(socket);
