@@ -28,6 +28,9 @@ static void *recv_process(void *listen) {
         if(msg == NULL){
             break;
         }
+
+        printf("Get a message: %s\n", msg->buffer);
+
         if (msg->flag == SND_MORE_FLAG) {
             queue_push(l->more_queue, (void *)msg);
         } else {
