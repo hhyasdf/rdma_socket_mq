@@ -103,6 +103,7 @@ int resolve_wr_queue_flag(Socket *socket_) {               // 处理 wr_queue �
                 }
                 queue_push(socket_->recv_queue, recv_msg);
                 printf("add a node: %s\n", recv_msg->buffer);
+                printf("num of socket->recv_queue: %d\n", socket_->recv_queue->node_num);
             }
             flag = 0;
         } else if (stat == CLOSERESOLVED){
