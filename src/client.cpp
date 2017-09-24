@@ -12,7 +12,7 @@ void *send_process(void *socket){
     Message *msg;
 
     for(int i = 0; i < MSG_COUNT; i ++) {
-        msg = Message_create((void *)MSG, sizeof(MSG), 0);
+        msg = Message_create((void *)MSG, sizeof(MSG), SND_MORE_FLAG);
         printf("Send a message: %s!\n", MSG);
 
         send_((Socket *)socket, msg);

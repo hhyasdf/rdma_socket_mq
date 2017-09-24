@@ -87,36 +87,36 @@ int resolve_wr_queue(Socket *socket_) {               // 处理 wr_queue 中的 
 }
 
 
-int resolve_wr_queue_flag(Socket *socket_) {               // 处理 wr_queue 中的 wc
-    struct ibv_wc *wc;
-    int flag = 1, stat;
-    Message *recv_msg = NULL;
+// int resolve_wr_queue_flag(Socket *socket_) {               // 处理 wr_queue 中的 wc
+//     struct ibv_wc *wc;
+//     int flag = 1, stat;
+//     Message *recv_msg = NULL;
 
-    while((wc = (struct ibv_wc *)queue_pop(socket_->wr_queue)) != NULL) {
-        if((stat = recv_wc_handle(socket_, wc, &recv_msg)) == RDMAREADSOLVED) {
-            if(recv_msg->flag == SND_MORE_FLAG){
-                queue_push(socket_->more_queue, recv_msg);
-            } else {
-                if(!queue_if_empty(socket_->more_queue)) {
-                    queue_push_q(socket_->recv_queue, socket_->more_queue);
-                    queue_reset(socket_->more_queue);
-                }
-                queue_push(socket_->recv_queue, recv_msg);
-                printf("add a node: %s\n", recv_msg->buffer);
-                printf("num of socket->recv_queue: %d\n", socket_->recv_queue->node_num);
-            }
-            flag = 0;
-        } else if (stat == CLOSERESOLVED){
-            queue_push_q(socket_->recv_queue, socket_->more_queue);
-            queue_reset(socket_->more_queue);
-            return -1;
-        } else if (stat == ERRORWC) {
-            return -1;
-        }
-        free(wc);
-    }
-    return flag;
-}
+//     while((wc = (struct ibv_wc *)queue_pop(socket_->wr_queue)) != NULL) {
+//         if((stat = recv_wc_handle(socket_, wc, &recv_msg)) == RDMAREADSOLVED) {
+//             if(recv_msg->flag == SND_MORE_FLAG){
+//                 queue_push(socket_->more_queue, recv_msg);
+//             } else {
+//                 if(!queue_if_empty(socket_->more_queue)) {
+//                     queue_push_q(socket_->recv_queue, socket_->more_queue);
+//                     queue_reset(socket_->more_queue);
+//                 }
+//                 queue_push(socket_->recv_queue, recv_msg);
+//                 printf("add a node: %s\n", recv_msg->buffer);
+//                 printf("num of socket->recv_queue: %d\n", socket_->recv_queue->node_num);
+//             }
+//             flag = 0;
+//         } else if (stat == CLOSERESOLVED){
+//             queue_push_q(socket_->recv_queue, socket_->more_queue);
+//             queue_reset(socket_->more_queue);
+//             return -1;
+//         } else if (stat == ERRORWC) {
+//             return -1;
+//         }
+//         free(wc);
+//     }
+//     return flag;
+// }
 
 
 
