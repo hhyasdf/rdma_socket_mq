@@ -24,5 +24,6 @@ void queue_destroy(Queue *queue);
 bool queue_if_empty(Queue *queue);
 void queue_push_q(Queue *de_queue, Queue *src_queue);
 int num_of_queue(Queue *queue);
+void queue_reset(Queue *queue);
 
 #endif

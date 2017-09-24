@@ -92,6 +92,14 @@ void queue_push_q(Queue *de_queue, Queue *src_queue) {
     pthread_mutex_unlock(&de_queue->queue_lock);
 }
 
+void queue_reset(Queue *queue) {
+    pthread_mutex_lock(&queue->queue_lock);
+    queue->head = NULL;
+    queue->tail = NULL;
+    queue->node_num = 0;
+    pthread_mutex_unlock(&queue->queue_lock);
+}
+
 int num_of_queue(Queue *queue) {
     return queue->node_num;
 }

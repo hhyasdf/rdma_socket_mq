@@ -33,8 +33,7 @@ static void *recv_process(void *listen) {
         // } else {
         //     if(!queue_if_empty(more_queue)) {
         //         queue_push_q(l->recv_queue, more_queue);
-        //         more_queue->head = NULL;
-        //         more_queue->tail = NULL;
+        //         queue_reset(more_queue);
         //     }
         //     queue_push(l->receiver->recv_queue, (void *)msg);
 
@@ -43,6 +42,8 @@ static void *recv_process(void *listen) {
         listen = recv_(l, l->receiver->recv_queue);
         printf("Success recv!\n");
         printf("num of recv_queue: %d", l->recv_queue->node_num);
+
+        
 
         if(listen == NULL) {
             break;

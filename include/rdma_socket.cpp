@@ -400,8 +400,7 @@ Socket *recv_(Socket *socket_, Queue *de_queue) {
 
     if(!queue_if_empty(socket_->recv_queue)) {
         queue_push_q(de_queue, socket_->recv_queue);
-        socket_->recv_queue->head = NULL;
-        socket_->recv_queue->tail = NULL;      
+        queue_reset(socket_->recv_queue);     
         return socket_;
     } else if(pthread_mutex_trylock(&socket_->close_lock)) {    // 往下 *recv_buffer 都为 NULL
         return NULL;
@@ -425,8 +424,7 @@ Socket *recv_(Socket *socket_, Queue *de_queue) {
     }
 
     queue_push_q(de_queue, socket_->recv_queue);
-    socket_->recv_queue->head = NULL;
-    socket_->recv_queue->tail = NULL;
+    queue_reset(socket_->recv_queue);
     return socket_;
 }
 
