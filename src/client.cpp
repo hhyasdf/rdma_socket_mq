@@ -6,7 +6,7 @@
 #define MSG_LEN 32
 #define MSG "A message from client!@#$%^&*()"
 #define MSG_COUNT 100
-#define THREAD_NUM 1
+#define THREAD_NUM 2
 
 void *send_process(void *socket){
     Message *msg;
