@@ -156,14 +156,11 @@ Socket *accept_(Socket *socket_, struct Receiver_ *receiver) {
     struct rdma_cm_event event_copy;
     struct rdma_conn_param cm_params;
     
-    printf("%s line: %d \n", __FILE__, __LINE__);
     while (rdma_get_cm_event(ec, &event) == 0) {
         
         memcpy(&event_copy, event, sizeof(*event));
 
         rdma_ack_cm_event(event);
-
-        printf("%s line: %d \n", __FILE__, __LINE__);
 
         if(event_copy.event == RDMA_CM_EVENT_CONNECT_REQUEST) {
             
