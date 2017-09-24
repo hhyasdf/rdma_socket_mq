@@ -39,13 +39,16 @@ static void *recv_process(void *listen) {
             queue_push(l->more_queue, (void *)msg);
         } else {
             if(!queue_if_empty(more_queue)) {
-                queue_push_q(l->recv_queue, more_queue);
+                queue_push_q(l->receiver->recv_queue, more_queue);
                 queue_reset(more_queue);
             }
             queue_push(l->receiver->recv_queue, (void *)msg);
 
             pthread_cond_signal(&l->receiver->cond);
         }
+
+        // 想改成一次性将socket的recv_queue 都放进去的操作
+
         // listen = recv_(l, l->receiver->recv_queue);
         // printf("Success recv!\n");
         // printf("num of recv_queue %p: %d\n", l->receiver->recv_queue, l->receiver->recv_queue->node_num);

@@ -86,6 +86,7 @@ int resolve_wr_queue(Socket *socket_) {               // 处理 wr_queue 中的 
     return flag;
 }
 
+// 想改成一次性将socket的recv_queue 都放进去的操作
 
 // int resolve_wr_queue_flag(Socket *socket_) {               // 处理 wr_queue 中的 wc
 //     struct ibv_wc *wc;

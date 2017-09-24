@@ -368,6 +368,7 @@ Message *recv_(Socket *socket_) {            // 用户提供指针地址，函�
     return (Message *)queue_pop(socket_->recv_queue);
 }
 
+// 想改成一次性将socket的recv_queue 都放进去的操作
 
 // Socket *recv_(Socket *socket_, Queue *de_queue) {
 //     int flag = 1;
