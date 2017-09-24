@@ -16,7 +16,7 @@ void *send_process(void *socket){
         printf("Send a message: %s!\n", MSG);
 
         send_((Socket *)socket, msg);
-        free(msg);
+        Message_destroy(msg);
     }
     close_((Socket *)socket);
 }

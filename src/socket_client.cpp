@@ -26,7 +26,7 @@ int main(int argc, char **argv) {
         msg = Message_create((void *)MSG, sizeof(MSG), 0);
         if(send_(socket, msg))break;
         printf("%s\n", msg->buffer);
-        free(msg);
+        Message_destroy(msg);
     }
     
     close_(socket);

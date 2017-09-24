@@ -46,8 +46,7 @@ int main(int argc, char** argv) {
             break;
         }
         printf("%s\n", buffer->buffer);
-        free(buffer->buffer);
-        free(buffer);
+        Message_destroy(buffer);
     }
 
     close_(listen);

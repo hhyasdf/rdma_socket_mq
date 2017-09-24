@@ -138,7 +138,7 @@ int recv_wc_handle(Socket *socket_, struct ibv_wc *wc, Message **recv_msg) {    
     if(md_buffer->type == METADATA_NORMAL) {
         struct ibv_mr *read_mr;
 
-        *recv_msg = Message_create(malloc(md_buffer->length), md_buffer->length, md_buffer->flag);
+        *recv_msg = Message_create(malloc(md_buffer->length), md_buffer->length, md_buffer->flag, true);
             
         TEST_Z(read_mr = ibv_reg_mr(
             socket_->pd,

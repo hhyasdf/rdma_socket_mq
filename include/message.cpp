@@ -4,15 +4,23 @@
 
 
 
-Message *Message_create(void *buffer, int length, int flag) {          // buffer要自己分配
+Message *Message_create(void *buffer, int length, int flag, bool if_free_buffer) {          // buffer要自己分配
     Message *msg = (Message *)malloc(sizeof(Message));
     msg->buffer = buffer;
     msg->flag = flag;
     msg->length = length;
+    msg->if_free_buffer = if_free_buffer;
 
     return msg;
 }
 
 bool Message_check_sndmore(Message *msg) {
     return (msg->flag == SND_MORE_FLAG);
+}
+
+void Message_destroy(Message *msg) {
+    if(msg->if_free_buffer) {
+        free(msg->buffer);
+    }
+    free(msg);
 }
