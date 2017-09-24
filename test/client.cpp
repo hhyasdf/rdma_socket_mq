@@ -5,14 +5,14 @@
 
 #define MSG_LEN 32
 #define MSG "A message from client!@#$%^&*()"
-#define MSG_COUNT 1
+#define MSG_COUNT 2
 #define THREAD_NUM 10
 
 void *send_process(void *socket){
     Message *msg;
 
     for(int i = 0; i < MSG_COUNT; i ++) {
-        msg = Message_create((void *)MSG, sizeof(MSG), SND_MORE_FLAG);
+        msg = Message_create((void *)MSG, sizeof(MSG), 0);
         printf("Send a message: %s!\n", MSG);
 
         send_((Socket *)socket, msg);
