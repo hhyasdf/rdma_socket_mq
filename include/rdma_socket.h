@@ -3,7 +3,7 @@
 #include "queue.h"
 #include <netdb.h>
 #include <pthread.h>
-#include "AMessage.h"
+#include "amessage.h"
 #include "receiver.h"
 
 

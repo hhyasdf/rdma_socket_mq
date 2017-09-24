@@ -1,4 +1,4 @@
-#include "../include/AMessage.h"
+#include "../include/amessage.h"
 #include "../include/rdma_socket.h"
 #include <stdlib.h>
 

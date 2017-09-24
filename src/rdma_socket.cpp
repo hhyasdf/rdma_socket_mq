@@ -2,7 +2,7 @@
 #include "../include/post_wr.h"
 #include "../include/poll_wc.h"
 #include "../include/init.h"
-#include "../include/AMessage.h"
+#include "../include/amessage.h"
 
 #include <unistd.h>
 #include <stdlib.h>
