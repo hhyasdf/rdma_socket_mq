@@ -26,6 +26,8 @@ static void *recv_process(void *listen) {
     while(1) {
         msg = recv_(l);
         if(msg == NULL){
+            queue_push_q(l->recv_queue, more_queue);
+            queue_reset(more_queue);            
             break;
         }
 
