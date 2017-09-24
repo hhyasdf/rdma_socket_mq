@@ -14,11 +14,11 @@ int main(int argc, char** argv) {
     Message *msg;
     Receiver *re = receiver_build();
     receiver_bind(re, DEFAULT_PORT);
-    // for(int i=0; i < 10; i++) {
-    //     msg = receiver_recv(re);
-    //     printf("Get a message : %s\n", msg->buffer);
-    //     Message_destroy(msg);
-    //     msg = NULL;
-    // }
+    for(int i=0; i < 10; i++) {
+        msg = receiver_recv(re);
+        printf("Get a message : %s\n", msg->buffer);
+        Message_destroy(msg);
+        msg = NULL;
+    }
     receiver_close(re);
 }
