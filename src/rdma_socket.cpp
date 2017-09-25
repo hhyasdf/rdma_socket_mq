@@ -231,7 +231,7 @@ int connect_(Socket **socket_, const char *address, char *port, int node_id) {
             AMessage *id_msg = AMessage_create(&node_id, sizeof(int), 0);
             send_(new_socket_, id_msg);
 
-            pthread_create(&(new_socket_->close_pthread), NULL, wait_for_close, new_socket_);
+            pthread_create(&((*socket_)->close_pthread), NULL, wait_for_close, new_socket_);
 
             return 1;
         } else if (event.event == RDMA_CM_EVENT_DISCONNECTED) {
