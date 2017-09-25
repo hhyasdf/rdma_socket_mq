@@ -254,6 +254,10 @@ void close_(Socket *socket_) {                   // 释放socket结构体和其�
     if(send_close_md(socket_)){
         rdma_disconnect(socket_->id);
     }
+    if(socket_->close_pthread == 0) {
+        free(socket_);
+        return;
+    }
     pthread_join(socket_->close_pthread, NULL);
 
     rdma_destroy_id(socket_->id);
