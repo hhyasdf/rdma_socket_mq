@@ -198,7 +198,7 @@ Socket *accept_(Socket *socket_, struct Receiver_ *receiver) {
 }
 
 
-int connect_(Socket **socket_, char *address, const char *port, int node_id) {         
+int connect_(Socket **socket_, const char *address, char *port, int node_id) {         
     
     struct addrinfo *addr;
     TEST_NZ(getaddrinfo(address, port, NULL, &addr));
