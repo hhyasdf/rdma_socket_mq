@@ -137,10 +137,24 @@ static void *wait_for_close(void *socket_) {
 
             free(sock->metaData_buffer);
 
-            rdma_destroy_id(sock->id);
-            rdma_destroy_event_channel(sock->ec);
+            // rdma_destroy_id(sock->id);
+            // rdma_destroy_event_channel(sock->ec);
         
-            ibv_dealloc_pd(sock->pd);
+            // ibv_dealloc_pd(sock->pd);
+
+            resolve_wr_queue(sock);
+            // resolve_wr_queue_flag(sock);
+            
+        
+            queue_destroy(sock->recv_queue);
+            queue_destroy(sock->wr_queue);
+        
+            pthread_mutex_destroy(&sock->close_lock);
+            pthread_mutex_destroy(&sock->peer_buff_count_lock);
+            pthread_mutex_destroy(&sock->metadata_counter_lock);
+            pthread_mutex_destroy(&sock->ack_counter_lock);
+        
+            free(sock);
         
             return 0;
         }
@@ -241,19 +255,25 @@ void close_(Socket *socket_) {                   // 释放socket结构体和其�
         rdma_disconnect(socket_->id);
     }
     pthread_join(socket_->close_pthread, NULL);
-    resolve_wr_queue(socket_);
-    // resolve_wr_queue_flag(socket_);
+
+    rdma_destroy_id(socket_->id);
+    rdma_destroy_event_channel(socket_->ec);
+
+    ibv_dealloc_pd(socket_->pd);
+
+    // resolve_wr_queue(socket_);
+    // // resolve_wr_queue_flag(socket_);
     
 
-    queue_destroy(socket_->recv_queue);
-    queue_destroy(socket_->wr_queue);
+    // queue_destroy(socket_->recv_queue);
+    // queue_destroy(socket_->wr_queue);
 
-    pthread_mutex_destroy(&socket_->close_lock);
-    pthread_mutex_destroy(&socket_->peer_buff_count_lock);
-    pthread_mutex_destroy(&socket_->metadata_counter_lock);
-    pthread_mutex_destroy(&socket_->ack_counter_lock);
+    // pthread_mutex_destroy(&socket_->close_lock);
+    // pthread_mutex_destroy(&socket_->peer_buff_count_lock);
+    // pthread_mutex_destroy(&socket_->metadata_counter_lock);
+    // pthread_mutex_destroy(&socket_->ack_counter_lock);
 
-    free(socket_);
+    // free(socket_);
 }
 
 
