@@ -12,8 +12,12 @@ void *send_process(void *socket){
     AMessage *msg;
 
     for(int i = 0; i < MSG_COUNT; i ++) {
-        msg = AMessage_create((void *)MSG, sizeof(MSG), SND_MORE_FLAG);
-        printf("Send a AMessage: %s!\n", MSG);
+        if((i % 5) == 0) {
+            msg = AMessage_create((void *)MSG, sizeof(MSG), 0);
+        } else {
+            msg = AMessage_create((void *)MSG, sizeof(MSG), SND_MORE_FLAG);
+        }
+        printf("Send a AMessage: %s!\n, flag: %d", MSG);
 
         send_((Socket *)socket, msg);
         AMessage_destroy(msg);
