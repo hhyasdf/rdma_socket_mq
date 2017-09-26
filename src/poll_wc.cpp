@@ -204,21 +204,18 @@ int recv_wc_handle(Socket *socket_, struct ibv_wc *wc, AMessage **recv_msg) {   
         ibv_dereg_mr((struct ibv_mr *)md_buffer->mr_addr);
 
         free((void *)md_buffer->msg_addr);
-        md_buffer->msg_addr = NULL;
-
-        md_buffer->mr_addr = NULL;
 
         pthread_mutex_lock(&socket_->ack_counter_lock);
         socket_->ack_counter ++;
         pthread_mutex_unlock(&socket_->ack_counter_lock);
+
+        memset(md_buffer, 0, sizeof(MetaData));
 
         TEST_NZ(rdma_post_recv(socket_->id, 
         rinfo, 
         md_buffer, 
         sizeof(MetaData), 
         (struct ibv_mr *)rinfo->mr));
-
-        md_buffer->type = 0;
 
         return ACKSOLVED;
     } else if (md_buffer->type == METADATA_CLOSE) {
