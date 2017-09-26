@@ -141,6 +141,8 @@ int recv_wc_handle(Socket *socket_, struct ibv_wc *wc, AMessage **recv_msg) {   
     if(md_buffer->type == METADATA_NORMAL) {
         struct ibv_mr *read_mr;
 
+        pthread_mutex_lock(&socket_->close_lock);
+
         *recv_msg = AMessage_create(malloc(md_buffer->length), md_buffer->length, md_buffer->flag, true);
         (*recv_msg)->node_id = socket_->node_id;
             
@@ -185,13 +187,15 @@ int recv_wc_handle(Socket *socket_, struct ibv_wc *wc, AMessage **recv_msg) {   
             }
         }
 
-        memset(md_buffer, 0, sizeof(MetaData));
+        md_buffer->type = 0;
 
         TEST_NZ(rdma_post_recv(socket_->id, 
         rinfo, 
         md_buffer, 
         sizeof(MetaData), 
         (struct ibv_mr *)rinfo->mr));
+
+        pthread_mutex_unlock(&socket_->close_lock);
 
         return RDMAREADSOLVED;
 
@@ -209,7 +213,7 @@ int recv_wc_handle(Socket *socket_, struct ibv_wc *wc, AMessage **recv_msg) {   
         socket_->ack_counter ++;
         pthread_mutex_unlock(&socket_->ack_counter_lock);
 
-        memset(md_buffer, 0, sizeof(MetaData));
+        md_buffer->type = 0;
 
         TEST_NZ(rdma_post_recv(socket_->id, 
         rinfo, 
@@ -220,8 +224,6 @@ int recv_wc_handle(Socket *socket_, struct ibv_wc *wc, AMessage **recv_msg) {   
         return ACKSOLVED;
     } else if (md_buffer->type == METADATA_CLOSE) {
 
-        memset(md_buffer, 0, sizeof(MetaData));
-        
         TEST_NZ(rdma_post_recv(socket_->id, 
         rinfo, 
         md_buffer, 
