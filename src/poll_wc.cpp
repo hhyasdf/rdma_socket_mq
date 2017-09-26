@@ -22,6 +22,7 @@ void close_handle(Socket *socket_, struct ibv_wc *wc) {                         
     MetaData *recv_buffer = (MetaData *)rinfo->buffer;
 
     printf("rinfo: %p\n", rinfo);
+    printf("wr_queue length: %d\n", socket_->wr_queue->node_num);
 
     if(recv_buffer->type == METADATA_ACK) {
         if(recv_buffer->mr_addr != NULL) {
