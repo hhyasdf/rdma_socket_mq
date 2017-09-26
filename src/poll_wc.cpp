@@ -21,6 +21,8 @@ void close_handle(Socket *socket_, struct ibv_wc *wc) {                         
     }
     MetaData *recv_buffer = (MetaData *)rinfo->buffer;
 
+    printf("rinfo: %p\n", rinfo);
+
     if(recv_buffer->type == METADATA_ACK) {
         if(recv_buffer->mr_addr != NULL) {
             printf("line: %d ,dereg: %p\n", __LINE__, recv_buffer->mr_addr);            

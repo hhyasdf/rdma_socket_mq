@@ -122,7 +122,7 @@ static void *wait_for_close(void *socket_) {
             Rinfo *rinfo;
             MetaData *recv_buffer;
 
-            while(ibv_poll_cq(sock->cq, 1, &wc) == 1) {
+            while(ibv_poll_cq(sock->cq, 1, &wc) == 1) {                         // !!
                 wc_save = (struct ibv_wc *)malloc(sizeof(struct ibv_wc));
                 memcpy(wc_save, &wc, sizeof(wc));
                 queue_push(sock->wr_queue, wc_save);
@@ -130,22 +130,6 @@ static void *wait_for_close(void *socket_) {
             while((wc_save = (struct ibv_wc *)queue_pop(sock->wr_queue)) != NULL){
                 close_handle(sock, wc_save);
             }
-            
-            // while((rinfo = (Rinfo *)queue_pop(sock->rinfo_queue))){
-            //     MetaData *recv_buffer = (MetaData *)rinfo->buffer;
-            
-            //         if(recv_buffer->type == METADATA_ACK) {
-            //             if((struct ibv_mr *)recv_buffer->mr_addr != NULL) {
-            //                 printf("line: %d ,dereg: %p\n", __LINE__, recv_buffer->mr_addr);
-                            
-            //                 ibv_dereg_mr((struct ibv_mr *)recv_buffer->mr_addr);
-            //                 recv_buffer->mr_addr = NULL;
-            //             }
-            //             free((void *)recv_buffer->msg_addr);
-            //         }
-            //     ibv_dereg_mr(rinfo->mr);
-            //     free(rinfo);
-            // }
 
             rdma_destroy_qp(sock->id);
             ibv_destroy_cq(sock->cq);
