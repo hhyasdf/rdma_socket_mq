@@ -9,7 +9,6 @@
 
 void post_recv_wr(Socket *socket_, void *recv_buffer) {
     Rinfo *recv_Rinfo = (Rinfo *)malloc(sizeof(Rinfo));
-    memset(recv_Rinfo, 0, sizeof(Rinfo));
 
     TEST_Z(recv_Rinfo->mr = ibv_reg_mr(
         socket_->pd,

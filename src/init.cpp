@@ -54,9 +54,9 @@ Socket *buildConnection(struct rdma_cm_id *id, int node_id) {  // 用收到的id
     new_socket_->qp = id->qp;
 
     new_socket_->rinfo_queue = queue_init();
-    
+
     MetaData *recv_buffer = (MetaData *)malloc(MDBUFFERSIZE * sizeof(MetaData));
-    // memset(recv_buffer, 0, MDBUFFERSIZE * sizeof(MetaData));
+    memset(recv_buffer, 0, MDBUFFERSIZE * sizeof(MetaData));
     new_socket_->metaData_buffer = recv_buffer;
     for(int i=0; i < MDBUFFERSIZE; i++) {                                         // 初始化放一堆 recv 到 qp
         post_recv_wr(new_socket_, recv_buffer ++);
