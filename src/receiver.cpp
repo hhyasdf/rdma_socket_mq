@@ -28,7 +28,7 @@ static void *recv_process(void *listen) {
     while(1) {
         msg = recv_(l);
         if(msg == NULL){
-            printf("more queue length: %d\n", more_queue->node_num);
+            // printf("more queue length: %d\n", more_queue->node_num);
             queue_push_q(l->receiver->recv_queue, more_queue);
             queue_push_q(l->receiver->recv_queue, l->recv_queue);
             queue_reset(l->recv_queue);
