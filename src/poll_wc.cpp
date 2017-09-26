@@ -32,7 +32,6 @@ void close_handle(Socket *socket_, struct ibv_wc *wc) {                         
 
     ibv_dereg_mr(rinfo->mr);
     free(rinfo);
-    wc->wr_id = NULL;
 }
 
 
@@ -218,6 +217,8 @@ int recv_wc_handle(Socket *socket_, struct ibv_wc *wc, AMessage **recv_msg) {   
         md_buffer, 
         sizeof(MetaData), 
         (struct ibv_mr *)rinfo->mr));
+
+        md_buffer->type = 0;
 
         return ACKSOLVED;
     } else if (md_buffer->type == METADATA_CLOSE) {

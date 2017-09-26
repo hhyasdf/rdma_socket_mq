@@ -135,7 +135,7 @@ static void *wait_for_close(void *socket_) {
             ibv_destroy_cq(sock->cq);
             ibv_destroy_comp_channel(sock->cc);
 
-            free(sock->metaData_buffer);
+            // free(sock->metaData_buffer);
 
             // rdma_destroy_id(sock->id);
             // rdma_destroy_event_channel(sock->ec);
@@ -275,6 +275,7 @@ void close_(Socket *socket_) {                   // 释放socket结构体和其�
     pthread_mutex_destroy(&socket_->metadata_counter_lock);
     pthread_mutex_destroy(&socket_->ack_counter_lock);
 
+    free(socket_->metaData_buffer);
     free(socket_);
 }
 
