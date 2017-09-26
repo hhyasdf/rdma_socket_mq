@@ -9,10 +9,6 @@
 #include <signal.h>
 
 
-static void sig_handle(int signo) {
-    pthread_exit(NULL);
-}
-
 Receiver *receiver_build() {
     Receiver *n = (Receiver *)malloc(sizeof(Receiver));
 
@@ -106,8 +102,6 @@ int receiver_bind(Receiver* re, int port) {
     listen_(socket, 100);
     re->listener = socket;
 
-    signal(SIGUSR1, sig_handle);
-
     pthread_create(&static_cast<Receiver *>(re)->p_id, NULL, listen_process, (void *)re);
     return flag;
 }
@@ -136,6 +130,7 @@ void receiver_close(Receiver *re) {
     queue_destroy(re->socket_queue);
     queue_destroy(re->recv_queue);
 
-    pthread_kill(re->p_id, SIGUSR1);
+    pthread_cancel(re->p_id);
+    raise(SIGALRM);
 }
 

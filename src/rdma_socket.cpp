@@ -68,11 +68,17 @@ static int send_close_md(Socket *socket_) {
     memset(&metadata, 0, sizeof(metadata));
     metadata.type = METADATA_CLOSE;
 
+    if(pthread_mutex_trylock(&socket_->close_lock)) {
+        return 0;
+    }
+
     send_mr = post_send_wr(socket_, &metadata);
 
     while(poll_wc(socket_, &wc) > 0);
 
     ibv_dereg_mr(send_mr);
+
+    pthread_mutex_unlock(&socket_->close_lock);
 
     if(wc.status != IBV_WC_SUCCESS) {
 
