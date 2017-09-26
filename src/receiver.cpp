@@ -124,7 +124,7 @@ AMessage *receiver_recv(Receiver* re) {
 
 void receiver_close(Receiver *re) {
     Socket *socket = NULL;
-    free(re->listener);
+    close_(re->listener);
     while((socket = static_cast<Socket *>(queue_pop(re->socket_queue))) != NULL) {
         close_(socket);
     }
