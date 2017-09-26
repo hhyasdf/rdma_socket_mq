@@ -185,7 +185,7 @@ int recv_wc_handle(Socket *socket_, struct ibv_wc *wc, AMessage **recv_msg) {   
             }
         }
 
-        md_buffer->type = METADATA_NORMAL;
+        memset(md_buffer, 0, sizeof(MetaData));
 
         TEST_NZ(rdma_post_recv(socket_->id, 
         rinfo, 
