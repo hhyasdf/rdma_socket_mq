@@ -131,9 +131,9 @@ static void *wait_for_close(void *socket_) {
                 close_handle(sock, wc_save);
             }
 
-            // rdma_destroy_qp(sock->id);
-            // ibv_destroy_cq(sock->cq);
-            // ibv_destroy_comp_channel(sock->cc);
+            rdma_destroy_qp(sock->id);
+            ibv_destroy_cq(sock->cq);
+            ibv_destroy_comp_channel(sock->cc);
 
             // free(sock->metaData_buffer);
 
@@ -257,10 +257,6 @@ void close_(Socket *socket_) {                   // 释放socket结构体和其�
         return;
     }
     pthread_join(socket_->close_pthread, NULL);
-
-    rdma_destroy_qp(socket_->id);
-    ibv_destroy_cq(socket_->cq);
-    ibv_destroy_comp_channel(socket_->cc);
 
     rdma_destroy_id(socket_->id);
     rdma_destroy_event_channel(socket_->ec);

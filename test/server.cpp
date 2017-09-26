@@ -14,12 +14,12 @@ int main(int argc, char** argv) {
     AMessage *msg;
     Receiver *re = receiver_build();
     receiver_bind(re, DEFAULT_PORT);
-    for(int i=0; i < 40; i++) {
-        msg = receiver_recv(re);
-        printf("Get a AMessage : %s, from %d\n", msg->buffer, msg->node_id);
-        AMessage_destroy(msg);
-        msg = NULL;
-        printf("%d\n", i);
-    }
+    // for(int i=0; i < 40; i++) {
+    //     msg = receiver_recv(re);
+    //     printf("Get a AMessage : %s, from %d\n", msg->buffer, msg->node_id);
+    //     AMessage_destroy(msg);
+    //     msg = NULL;
+    //     printf("%d\n", i);
+    // }
     receiver_close(re);
 }
