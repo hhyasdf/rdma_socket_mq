@@ -247,8 +247,7 @@ int connect_(Socket **socket_, const char *address, char *port, int node_id) {
 void close_(Socket *socket_) {                   // 释放socket结构体和其中的两个动态分配的队列
     
     if(socket_->pd == NULL) {
-        // rdma_disconnect(socket_->id);
-        rdma_destroy_event_channel(socket_->ec);
+        rdma_disconnect(socket_->id);
         return;
     }
     send_close_md(socket_);

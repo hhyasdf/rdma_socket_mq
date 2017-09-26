@@ -34,21 +34,21 @@ int main(int argc, char** argv) {
 
     listen_(socket, 10);
 
-    // listen = accept_(socket, NULL);
-    // AMessage *buffer = (AMessage *)1;
+    listen = accept_(socket, NULL);
+    AMessage *buffer = (AMessage *)1;
         
         // sleep(5);          // 测试缓冲计数 达到缓冲最大值时send会阻塞 默认是10
         // printf("ready\n");
-    // while(1){
-    //     buffer = recv_(listen);
-    //     if(buffer == NULL){
-    //         printf("stop recv !\n");
-    //         break;
-    //     }
-    //     printf("%s\n", buffer->buffer);
-    //     printf("node_id: %d\n", buffer->node_id);
-    //     AMessage_destroy(buffer); 
-    // }
+    while(1){
+        buffer = recv_(listen);
+        if(buffer == NULL){
+            printf("stop recv !\n");
+            break;
+        }
+        printf("%s\n", buffer->buffer);
+        printf("node_id: %d\n", buffer->node_id);
+        AMessage_destroy(buffer); 
+    }
 
     close_(listen);
 }
