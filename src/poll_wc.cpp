@@ -219,6 +219,9 @@ int recv_wc_handle(Socket *socket_, struct ibv_wc *wc, AMessage **recv_msg) {   
 
         return ACKSOLVED;
     } else if (md_buffer->type == METADATA_CLOSE) {
+
+        memset(md_buffer, 0, sizeof(MetaData));
+        
         TEST_NZ(rdma_post_recv(socket_->id, 
         rinfo, 
         md_buffer, 
