@@ -16,12 +16,12 @@
 
 void close_handle(Socket *socket_, struct ibv_wc *wc) {                          // 关闭时处理wc的函数
     Rinfo *rinfo  = (Rinfo *)wc->wr_id;
-    if(rinfo == NULL) {
+    if(rinfo == NULL || wc->opcode != IBV_WC_RECV) {
         return ;
     }
     MetaData *recv_buffer = (MetaData *)rinfo->buffer;
 
-    if(recv_buffer->type == METADATA_ACK && wc->opcode == IBV_WC_RECV) {
+    if(recv_buffer->type == METADATA_ACK) {
         if(recv_buffer->mr_addr != NULL) {            
             ibv_dereg_mr((struct ibv_mr *)recv_buffer->mr_addr);
             recv_buffer->mr_addr = NULL;
