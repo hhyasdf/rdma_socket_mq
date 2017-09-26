@@ -131,6 +131,5 @@ void receiver_close(Receiver *re) {
     queue_destroy(re->recv_queue);
 
     pthread_cancel(re->p_id);
-    raise(SIGALRM);
 }
 
