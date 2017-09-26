@@ -185,13 +185,13 @@ int recv_wc_handle(Socket *socket_, struct ibv_wc *wc, AMessage **recv_msg) {   
             }
         }
 
+        md_buffer->type = METADATA_NORMAL;
+
         TEST_NZ(rdma_post_recv(socket_->id, 
         rinfo, 
         md_buffer, 
         sizeof(MetaData), 
         (struct ibv_mr *)rinfo->mr));
-
-        md_buffer->type = METADATA_NORMAL;
 
         return RDMAREADSOLVED;
 
@@ -200,8 +200,6 @@ int recv_wc_handle(Socket *socket_, struct ibv_wc *wc, AMessage **recv_msg) {   
         pthread_mutex_lock(&socket_->peer_buff_count_lock);
         socket_->peer_buff_count ++;
         pthread_mutex_unlock(&socket_->peer_buff_count_lock);
-        
-        printf("line: %d ,dereg: %p\n", __LINE__, md_buffer->mr_addr);
         
         ibv_dereg_mr((struct ibv_mr *)md_buffer->mr_addr);
 
