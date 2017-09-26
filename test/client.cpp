@@ -17,7 +17,7 @@ void *send_process(void *socket){
         } else {
             msg = AMessage_create((void *)MSG, sizeof(MSG), SND_MORE_FLAG);
         }
-        printf("Send a AMessage: %s!\n, flag: %d", MSG);
+        printf("Send a AMessage: %s!, flag: %d\n", MSG);
 
         send_((Socket *)socket, msg);
         AMessage_destroy(msg);
