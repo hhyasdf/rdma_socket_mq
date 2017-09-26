@@ -169,18 +169,20 @@ int recv_wc_handle(Socket *socket_, struct ibv_wc *wc, AMessage **recv_msg) {   
 
         ibv_dereg_mr(read_mr);
 
-        md_buffer->type = METADATA_ACK;
-        TEST_NZ(rdma_post_send(socket_->id,
-        rinfo, 
-        md_buffer,
-        sizeof(MetaData), 
-        rinfo->mr, 
-        IBV_SEND_SIGNALED));
+        while(1) {
+            md_buffer->type = METADATA_ACK;
+            TEST_NZ(rdma_post_send(socket_->id,
+            rinfo, 
+            md_buffer,
+            sizeof(MetaData), 
+            rinfo->mr, 
+            IBV_SEND_SIGNALED));
 
-        while(poll_wc(socket_, &wc));
-        if(wc.status != IBV_WC_SUCCESS) {
-            printf("send ack error: %d!\n", wc.status);
-            return ERRORWC;
+            while(poll_wc(socket_, &wc));
+            if(wc.status == IBV_WC_SUCCESS) {
+                // printf("send ack error: %d!\n", wc.status);
+                break;
+            }
         }
 
         TEST_NZ(rdma_post_recv(socket_->id, 
