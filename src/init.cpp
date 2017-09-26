@@ -63,6 +63,7 @@ Socket *buildConnection(struct rdma_cm_id *id, int node_id) {  // 用收到的id
     new_socket_->recv_queue = queue_init();
     new_socket_->wr_queue = queue_init();
     new_socket_->more_queue = queue_init();
+    new_socket_->rinfo_queue = queue_init();
 
     pthread_mutex_init(&new_socket_->peer_buff_count_lock, NULL);
     pthread_mutex_init(&new_socket_->ack_counter_lock, NULL);

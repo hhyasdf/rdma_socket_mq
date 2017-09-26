@@ -20,6 +20,8 @@ void post_recv_wr(Socket *socket_, void *recv_buffer) {
 
     recv_Rinfo->buffer = recv_buffer;
 
+    queue_push(socket_->rinfo_queue, recv_Rinfo);
+
     TEST_NZ(rdma_post_recv(socket_->id, recv_Rinfo, recv_buffer, sizeof(MetaData), recv_Rinfo->mr));
 }
 

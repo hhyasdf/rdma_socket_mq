@@ -58,6 +58,7 @@ typedef struct Socket_ {
     Queue *recv_queue;
     Queue *wr_queue;
     Queue *more_queue;
+    Queue *rinfo_queue;
 
     MetaData *metaData_buffer;
 

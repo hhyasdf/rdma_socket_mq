@@ -127,8 +127,21 @@ static void *wait_for_close(void *socket_) {
                 memcpy(wc_save, &wc, sizeof(wc));
                 queue_push(sock->wr_queue, wc_save);
             }
-            while((wc_save = (struct ibv_wc *)queue_pop(sock->wr_queue)) != NULL) {
-                close_handle(sock, wc_save);
+            while((wc_save = (struct ibv_wc *)queue_pop(sock->wr_queue)) != NULL);
+            
+            while((rinfo = (Rinfo *)queue_pop(sock->rinfo_queue))){
+                MetaData *recv_buffer = (MetaData *)rinfo->buffer;
+            
+                    if(recv_buffer->type == METADATA_ACK) {
+                        if((struct ibv_mr *)recv_buffer->mr_addr != NULL) {
+                            ibv_dereg_mr((struct ibv_mr *)recv_buffer->mr_addr);
+                            recv_buffer->mr_addr = NULL;
+                            // printf("line: %d ,dereg: %p\n", __LINE__, recv_buffer->mr_addr);
+                        }
+                        free((void *)recv_buffer->msg_addr);
+                    }
+                ibv_dereg_mr(rinfo->mr);
+                free(rinfo);
             }
 
             rdma_destroy_qp(sock->id);
@@ -269,6 +282,7 @@ void close_(Socket *socket_) {                   // 释放socket结构体和其�
 
     queue_destroy(socket_->recv_queue);
     queue_destroy(socket_->wr_queue);
+    queue_destroy(socket_->more_queue);
 
     pthread_mutex_destroy(&socket_->close_lock);
     pthread_mutex_destroy(&socket_->peer_buff_count_lock);
