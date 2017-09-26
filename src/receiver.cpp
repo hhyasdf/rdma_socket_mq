@@ -108,7 +108,7 @@ int receiver_bind(Receiver* re, int port) {
 }
 
 AMessage *receiver_recv(Receiver* re) {
-    // while(1){
+    while(1){
         AMessage *msg;
         pthread_mutex_lock(&re->recv_queue->queue_lock);
         if(queue_if_empty(re->recv_queue)) {
@@ -118,7 +118,7 @@ AMessage *receiver_recv(Receiver* re) {
 
         msg = static_cast<AMessage *>(queue_pop(re->recv_queue));
         return msg;
-    // }
+    }
 }
 
 
