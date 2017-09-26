@@ -134,9 +134,10 @@ static void *wait_for_close(void *socket_) {
             
                     if(recv_buffer->type == METADATA_ACK) {
                         if((struct ibv_mr *)recv_buffer->mr_addr != NULL) {
+                            printf("line: %d ,dereg: %p\n", __LINE__, recv_buffer->mr_addr);
+                            
                             ibv_dereg_mr((struct ibv_mr *)recv_buffer->mr_addr);
                             recv_buffer->mr_addr = NULL;
-                            // printf("line: %d ,dereg: %p\n", __LINE__, recv_buffer->mr_addr);
                         }
                         free((void *)recv_buffer->msg_addr);
                     }
