@@ -21,15 +21,7 @@ void close_handle(Socket *socket_, struct ibv_wc *wc) {                         
     }
     MetaData *recv_buffer = (MetaData *)rinfo->buffer;
 
-    printf("rinfo: %p\n", rinfo);
-    printf("wr_queue length: %d\n", socket_->wr_queue->node_num);
-    printf("line: %d ,dereg: %p\n", __LINE__, recv_buffer->mr_addr);
-
-    if(recv_buffer->type == METADATA_ACK) {
-        printf("find an ACK!\n");
-        if(wc->opcode != IBV_WC_RECV) {
-            printf("it is not a recv wc!\n");
-        }
+    if(recv_buffer->type == METADATA_ACK && wc->opcode == IBV_WC_RECV) {
         if(recv_buffer->mr_addr != NULL) {            
             ibv_dereg_mr((struct ibv_mr *)recv_buffer->mr_addr);
             recv_buffer->mr_addr = NULL;
