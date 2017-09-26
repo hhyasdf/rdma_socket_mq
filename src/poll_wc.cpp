@@ -132,11 +132,6 @@ int recv_wc_handle(Socket *socket_, struct ibv_wc *wc, AMessage **recv_msg) {   
         return ERRORWC;
     }
 
-    if(pthread_mutex_trylock(&socket_->close_lock)) {
-        return ERRORWC;
-    }
-    pthread_mutex_unlock(&socket_->close_lock);
-
     Rinfo *rinfo;
     MetaData *md_buffer;
 
