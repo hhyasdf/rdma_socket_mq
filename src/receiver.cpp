@@ -117,7 +117,7 @@ AMessage *receiver_recv(Receiver* re) {
         pthread_mutex_unlock(&re->recv_queue->queue_lock);
 
         msg = static_cast<AMessage *>(queue_pop(re->recv_queue));
-        return msg;
+        if(msg != NULL)return msg;
     }
 }
 
