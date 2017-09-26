@@ -248,6 +248,7 @@ void close_(Socket *socket_) {                   // 释放socket结构体和其�
     
     if(socket_->pd == NULL) {
         // rdma_disconnect(socket_->id);
+        rdma_destroy_event_channel(socket_->ec);
         return;
     }
     send_close_md(socket_);
