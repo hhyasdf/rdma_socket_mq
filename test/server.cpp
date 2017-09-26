@@ -19,6 +19,7 @@ int main(int argc, char** argv) {
         printf("Get a AMessage : %s, from %d\n", msg->buffer, msg->node_id);
         AMessage_destroy(msg);
         msg = NULL;
+        printf("%d\n", i);
     }
     receiver_close(re);
 }

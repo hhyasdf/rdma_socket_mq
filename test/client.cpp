@@ -31,7 +31,7 @@ int main(int argc, char **argv) {
     for(int i = 0; i < THREAD_NUM; i ++){
         socket = socket_(RDMA_PS_TCP);
         connect_(&socket, argv[1], argv[2], i);
-        printf("connect : %p\n", connect);
+        printf("connect : %p\n", socket);
         pthread_create(p_id + i, NULL, send_process, socket);
     }
     
