@@ -132,6 +132,11 @@ int recv_wc_handle(Socket *socket_, struct ibv_wc *wc, AMessage **recv_msg) {   
         return ERRORWC;
     }
 
+    if(pthread_mutex_trylock(&socket_->close_lock)) {
+        return ERRORWC;
+    }
+    pthread_mutex_unlock(&socket_->close_lock);
+
     Rinfo *rinfo;
     MetaData *md_buffer;
 
@@ -140,8 +145,6 @@ int recv_wc_handle(Socket *socket_, struct ibv_wc *wc, AMessage **recv_msg) {   
 
     if(md_buffer->type == METADATA_NORMAL) {
         struct ibv_mr *read_mr;
-
-        pthread_mutex_lock(&socket_->close_lock);
 
         *recv_msg = AMessage_create(malloc(md_buffer->length), md_buffer->length, md_buffer->flag, true);
         (*recv_msg)->node_id = socket_->node_id;
@@ -194,8 +197,6 @@ int recv_wc_handle(Socket *socket_, struct ibv_wc *wc, AMessage **recv_msg) {   
         md_buffer, 
         sizeof(MetaData), 
         (struct ibv_mr *)rinfo->mr));
-
-        pthread_mutex_unlock(&socket_->close_lock);
 
         return RDMAREADSOLVED;
 
