@@ -23,15 +23,15 @@ void close_handle(Socket *socket_, struct ibv_wc *wc) {                         
 
     if(recv_buffer->type == METADATA_ACK) {
         if((struct ibv_mr *)recv_buffer->mr_addr != NULL) {
-            // ibv_dereg_mr((struct ibv_mr *)recv_buffer->mr_addr);
+            ibv_dereg_mr((struct ibv_mr *)recv_buffer->mr_addr);
             // printf("line: %d ,dereg: %p\n", __LINE__, recv_buffer->mr_addr);
         }
         free((void *)recv_buffer->msg_addr);
     }
 
-
     ibv_dereg_mr(rinfo->mr);
     free(rinfo);
+    wc->wr_id = NULL;
 }
 
 
