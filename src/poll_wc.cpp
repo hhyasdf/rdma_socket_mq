@@ -22,10 +22,10 @@ void close_handle(Socket *socket_, struct ibv_wc *wc) {                         
     MetaData *recv_buffer = (MetaData *)rinfo->buffer;
 
     if(recv_buffer->type == METADATA_ACK) {
-        if((struct ibv_mr *)recv_buffer->mr_addr != NULL) {
+        if(recv_buffer->mr_addr != NULL) {
+            printf("line: %d ,dereg: %p\n", __LINE__, recv_buffer->mr_addr);            
             ibv_dereg_mr((struct ibv_mr *)recv_buffer->mr_addr);
             recv_buffer->mr_addr = NULL;
-            // printf("line: %d ,dereg: %p\n", __LINE__, recv_buffer->mr_addr);
         }
         free((void *)recv_buffer->msg_addr);
     }
@@ -200,7 +200,9 @@ int recv_wc_handle(Socket *socket_, struct ibv_wc *wc, AMessage **recv_msg) {   
         pthread_mutex_lock(&socket_->peer_buff_count_lock);
         socket_->peer_buff_count ++;
         pthread_mutex_unlock(&socket_->peer_buff_count_lock);
-
+        
+        printf("line: %d ,dereg: %p\n", __LINE__, md_buffer->mr_addr);
+        
         ibv_dereg_mr((struct ibv_mr *)md_buffer->mr_addr);
 
         free((void *)md_buffer->msg_addr);
