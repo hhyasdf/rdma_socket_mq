@@ -41,10 +41,12 @@ static void *recv_process(void *listen) {
             queue_push(l->more_queue, (void *)msg);
         } else {
             if(!queue_if_empty(more_queue)) {
+                queue_push(l->more_queue, (void *)msg);
                 queue_push_q(l->receiver->recv_queue, more_queue);
                 queue_reset(more_queue);
+            } else {
+                queue_push(l->receiver->recv_queue, (void *)msg);
             }
-            queue_push(l->receiver->recv_queue, (void *)msg);
 
             pthread_cond_signal(&l->receiver->cond);
         }
