@@ -307,16 +307,23 @@ int send_(Socket *socket_, AMessage *msg) {      // 当一次性send操作数超
     }
     pthread_mutex_unlock(&socket_->close_lock);
     
-    TEST_Z(msg_mr = ibv_reg_mr(
-        socket_->pd,
-        buffer_copy,
-        length,
-        IBV_ACCESS_LOCAL_WRITE | IBV_ACCESS_REMOTE_WRITE | IBV_ACCESS_REMOTE_READ));
+    if(length != 0) {
+        TEST_Z(msg_mr = ibv_reg_mr(
+            socket_->pd,
+            buffer_copy,
+            length,
+            IBV_ACCESS_LOCAL_WRITE | IBV_ACCESS_REMOTE_WRITE | IBV_ACCESS_REMOTE_READ));
+        
+        metadata.msg_addr = (uint64_t)msg_mr->addr;//(uint64_t)buffer_copy;
+        metadata.rkey = msg_mr->rkey;
+        metadata.mr_addr = (uint64_t)msg_mr;
+    } else {
+        metadata.msg_addr = NULL;
+        metadata.rkey = NULL;
+        metadata.mr_addr = NULL;
+    }
     
     metadata.length = length;
-    metadata.msg_addr = (uint64_t)msg_mr->addr;//(uint64_t)buffer_copy;
-    metadata.rkey = msg_mr->rkey;
-    metadata.mr_addr = (uint64_t)msg_mr;
     metadata.type = METADATA_NORMAL;
     metadata.flag = msg->flag;
 

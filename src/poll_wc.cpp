@@ -139,17 +139,19 @@ int recv_wc_handle(Socket *socket_, struct ibv_wc *wc, AMessage **recv_msg) {   
 
     if(md_buffer->type == METADATA_NORMAL) {
         struct ibv_mr *read_mr;
+        struct ibv_wc wc;
 
-        *recv_msg = AMessage_create(malloc(md_buffer->length), md_buffer->length, md_buffer->flag, true);
-        (*recv_msg)->node_id = socket_->node_id;
+        if(md_buffer->length != 0) {
+
+            *recv_msg = AMessage_create(malloc(md_buffer->length), md_buffer->length, md_buffer->flag, true);
             
-        TEST_Z(read_mr = ibv_reg_mr(
-            socket_->pd,
-            (*recv_msg)->buffer,
-            md_buffer->length,
-            IBV_ACCESS_LOCAL_WRITE | IBV_ACCESS_REMOTE_WRITE | IBV_ACCESS_REMOTE_READ));
+            TEST_Z(read_mr = ibv_reg_mr(
+                socket_->pd,
+                (*recv_msg)->buffer,
+                md_buffer->length,
+                IBV_ACCESS_LOCAL_WRITE | IBV_ACCESS_REMOTE_WRITE | IBV_ACCESS_REMOTE_READ));
 
-        TEST_NZ(rdma_post_read(
+            TEST_NZ(rdma_post_read(
                 socket_->id, 
                 NULL, 
                 (*recv_msg)->buffer, 
@@ -159,14 +161,19 @@ int recv_wc_handle(Socket *socket_, struct ibv_wc *wc, AMessage **recv_msg) {   
                 md_buffer->msg_addr,
                 md_buffer->rkey));
         
-        struct ibv_wc wc;
-        while(poll_wc(socket_, &wc));
-        if(wc.status != IBV_WC_SUCCESS){
-            printf("remote read error: %d!\n", wc.status);
-            return ERRORWC;
+            while(poll_wc(socket_, &wc));
+            if(wc.status != IBV_WC_SUCCESS){
+                printf("remote read error: %d!\n", wc.status);
+                return ERRORWC;
+            }
+
+            ibv_dereg_mr(read_mr);
+
+        } else {
+            *recv_msg = AMessage_create(NULL, md_buffer->length, md_buffer->flag);
         }
 
-        ibv_dereg_mr(read_mr);
+        (*recv_msg)->node_id = socket_->node_id;
 
         while(1) {
             md_buffer->type = METADATA_ACK;
@@ -200,9 +207,10 @@ int recv_wc_handle(Socket *socket_, struct ibv_wc *wc, AMessage **recv_msg) {   
         socket_->peer_buff_count ++;
         pthread_mutex_unlock(&socket_->peer_buff_count_lock);
         
-        ibv_dereg_mr((struct ibv_mr *)md_buffer->mr_addr);
-
-        free((void *)md_buffer->msg_addr);
+        if(md_buffer->mr_addr != NULL) {
+            ibv_dereg_mr((struct ibv_mr *)md_buffer->mr_addr);
+            free((void *)md_buffer->msg_addr);
+        }
 
         pthread_mutex_lock(&socket_->ack_counter_lock);
         socket_->ack_counter ++;
