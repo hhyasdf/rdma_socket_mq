@@ -19,7 +19,7 @@
 #define NOTBLOCKRECV 1
 
 
-#define MDBUFFERSIZE 10                // 缓冲区大小
+#define MDBUFFERSIZE 50                // 缓冲区大小
 
 
 #define TEST_NZ(x) do { if ( (x)) die("error: " #x " failed (returned non-zero)." ); } while (0)
