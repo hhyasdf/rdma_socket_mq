@@ -170,7 +170,7 @@ int recv_wc_handle(Socket *socket_, struct ibv_wc *wc, AMessage **recv_msg) {   
             ibv_dereg_mr(read_mr);
 
         } else {
-            *recv_msg = AMessage_create(NULL, md_buffer->length, md_buffer->flag);
+            *recv_msg = AMessage_create((void *)0x1, md_buffer->length, md_buffer->flag);
         }
 
         (*recv_msg)->node_id = socket_->node_id;

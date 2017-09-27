@@ -19,7 +19,7 @@ int main(int argc, char** argv) {
         if(msg->length != 0) {
             printf("Get a AMessage : %s, from %d, flag = %d\n", msg->buffer, msg->node_id, msg->flag);
         } else {
-            printf("receive a zero message!\n");
+            printf("receive a zero message!, addr: %p\n", msg->buffer);
         }
         AMessage_destroy(msg);
         msg = NULL;
