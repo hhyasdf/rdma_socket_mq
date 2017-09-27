@@ -16,7 +16,11 @@ int main(int argc, char** argv) {
     receiver_bind(re, DEFAULT_PORT);
     for(int i=0; true; i++) {
         msg = receiver_recv(re);
-        printf("Get a AMessage : %s, from %d, flag = %d\n", msg->buffer, msg->node_id, msg->flag);
+        if(msg->length != 0) {
+            printf("Get a AMessage : %s, from %d, flag = %d\n", msg->buffer, msg->node_id, msg->flag);
+        } else {
+            printf("receive a zero message!\n");
+        }
         AMessage_destroy(msg);
         msg = NULL;
     }

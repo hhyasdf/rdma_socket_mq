@@ -296,10 +296,6 @@ int send_(Socket *socket_, AMessage *msg) {      // 当一次性send操作数超
     int length = msg->length;
     void *recv_buffer;
 
-    void *buffer_copy = malloc(length);
-
-    memcpy(buffer_copy, msg->buffer, length);
-
     MetaData metadata;
 
     if(pthread_mutex_trylock(&socket_->close_lock)) {
@@ -308,6 +304,9 @@ int send_(Socket *socket_, AMessage *msg) {      // 当一次性send操作数超
     pthread_mutex_unlock(&socket_->close_lock);
     
     if(length != 0) {
+        void *buffer_copy = malloc(length);
+        memcpy(buffer_copy, msg->buffer, length);
+
         TEST_Z(msg_mr = ibv_reg_mr(
             socket_->pd,
             buffer_copy,

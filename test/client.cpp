@@ -15,7 +15,7 @@ void *send_process(void *socket){
         if((i % 5) == 0) {
             msg = AMessage_create((void *)MSG, sizeof(MSG), 0);
         } else {
-            msg = AMessage_create((void *)MSG, sizeof(MSG), SND_MORE_FLAG);
+            msg = AMessage_create(NULL, 0, SND_MORE_FLAG);
         }
         printf("Send a AMessage: %s!, flag: %d\n", MSG);
 
