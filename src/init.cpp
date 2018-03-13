@@ -27,7 +27,7 @@ Socket *buildConnection(struct rdma_cm_id *id, int node_id) {  // 用收到的id
     new_socket_->id = id;
     new_socket_->node_id = node_id;
     new_socket_->ec = rdma_create_event_channel();
-    TEST_NZ(rdma_migrate_id(new_socket_->id, new_socket_->ec));
+    TEST_NZ(rdma_migrate_id(new_socket_->id, new_socket_->ec));     // 将一个已存在的id迁移到新的ec上，并将原来ec上的所有于id相关的事件迁移到新的ec上
 
 	TEST_Z(new_socket_->pd = ibv_alloc_pd(id->verbs));
 

@@ -184,7 +184,7 @@ Socket *accept_(Socket *socket_, struct Receiver_ *receiver) {
 
         if(event_copy.event == RDMA_CM_EVENT_CONNECT_REQUEST) {
             
-            new_socket_ = buildConnection(event_copy.id, 0);
+            new_socket_ = buildConnection(event_copy.id, 0);           // id 对应一个新的连接，创建一个新的 Socket
             new_socket_->receiver = receiver;
             ec = new_socket_->ec;
 
